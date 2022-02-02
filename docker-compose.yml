@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:latest
+    container_name: db_server
+    volumes:
+      - ./database/data:/var/lib/mysql
+      - ./database/initdb.d:/docker-entrypoint-initdb.d
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password123 # any random string will do
+      MYSQL_DATABASE: escoladeescrita # the name of your mysql database
+      MYSQL_USER: root # the name of the database user
+      MYSQL_PASSWORD: password123 # the password of the mysql user
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    container_name: wp-web
+    ports:
+      - "8000:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: password123
+      WORDPRESS_DB_NAME: escoladeescrita
+    working_dir: /var/www/html
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+volumes:
+  db_data:

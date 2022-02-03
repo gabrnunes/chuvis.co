@@ -2,7 +2,20 @@
 
 class wfAdminNoticeQueue {
 	protected static function _notices() {
-		return wfConfig::get_ser('adminNoticeQueue', array());
+		return self::_purgeObsoleteNotices(wfConfig::get_ser('adminNoticeQueue', array()));
+	}
+
+	private static function _purgeObsoleteNotices($notices) {
+		$altered = false;
+		foreach ($notices as $id => $notice) {
+			if ($notice['category'] === 'php8') {
+				unset($notices[$id]);
+				$altered = true;
+			}
+		}
+		if ($altered)
+			self::_setNotices($notices);
+		return $notices;
 	}
 	
 	protected static function _setNotices($notices) {
@@ -74,11 +87,13 @@ class wfAdminNoticeQueue {
 			$category = false;
 			$users = false;
 		}
-		
+
 		$notices = self::_notices();
+		$found = false;
 		foreach ($notices as $nid => $n) {
 			if ($id == $nid) { //ID match
 				unset($notices[$nid]);
+				$found=true;
 				break;
 			}
 			else if ($id !== false) {
@@ -89,14 +104,17 @@ class wfAdminNoticeQueue {
 				if ($users !== false) {
 					if (isset($n['users']) && wfUtils::sets_equal($users, $n['users'])) {
 						unset($notices[$nid]);
+						$found=true;
 					}
 				}
 				else {
 					unset($notices[$nid]);
+					$found=true;
 				}
 			}
 		}
-		self::_setNotices($notices);
+		if($found)
+			self::_setNotices($notices);
 	}
 	
 	public static function hasNotice($category = false, $users = false) {
@@ -172,6 +190,6 @@ class wfAdminNotice {
 			$severityClass = 'notice-warning';
 		}
 		
-		echo '<div class="wf-admin-notice notice ' . $severityClass . '" data-notice-id="' . esc_attr($this->_id) . '"><p>' . $this->_messageHTML . '</p><p>' . sprintf(__('<a class="wf-btn wf-btn-default wf-btn-sm wf-dismiss-link" href="#" onclick="wordfenceExt.dismissAdminNotice(\'%s\'); return false;">Dismiss</a>', 'wordfence'), esc_attr($this->_id)) . '</p></div>';
+		echo '<div class="wf-admin-notice notice ' . $severityClass . '" data-notice-id="' . esc_attr($this->_id) . '"><p>' . $this->_messageHTML . '</p><p><a class="wf-btn wf-btn-default wf-btn-sm wf-dismiss-link" href="#" onclick="wordfenceExt.dismissAdminNotice(\'' . esc_attr($this->_id) . '\'); return false;" role="button">' . esc_html__('Dismiss', 'wordfence') . '</a></p></div>';
 	}
 }

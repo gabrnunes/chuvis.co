@@ -3,7 +3,7 @@
  * Wp ULike Admin Panel
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2021
+ * @author     TechnoWich 2022
  * @link       https://wpulike.com
 */
 
@@ -66,6 +66,11 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                     __( 'TechnoWich', WP_ULIKE_SLUG )
                 ),
                 'footer_after'       => '',
+                'footer_text'        => sprintf(
+                    '<a href="%s" title="Documents" target="_blank">%s</a>',
+                    'https://docs.wpulike.com/category/8-settings/',
+                    __( 'Explore Settings', WP_ULIKE_SLUG )
+                ),
                 'enqueue_webfont'    => true,
                 'async_webfont'      => false,
                 'output_css'         => true,
@@ -221,6 +226,26 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                         'chosen'      => true,
                         'multiple'    => true,
                         'options'     => 'post_types'
+                    ),
+                    array(
+                        'id'          => 'blacklist_integration',
+                        'type'        => 'select',
+                        'title'       => __( 'Blacklist',WP_ULIKE_SLUG),
+                        'options'     => array(
+                            'default'  => __('Use the WP Ulike Blacklist', WP_ULIKE_SLUG),
+                            'comments' => __('Use the WordPress Disallowed Comment Keys', WP_ULIKE_SLUG)
+                        ),
+                        'default'     => 'default',
+                        'desc'        => sprintf(__('Choose which Blacklist you would prefer to use for voting buttons. The %s option can be found in the WordPress Discussion Settings page.', WP_ULIKE_SLUG),
+                            '<a href="'.admin_url('options-discussion.php').'">'.__('Disallowed Comment Keys', WP_ULIKE_SLUG).'</a>'
+                        )
+                    ),
+                    array(
+                        'id'         => 'blacklist_entries',
+                        'type'       => 'textarea',
+                        'title'      => __( 'Blacklist Entries', WP_ULIKE_SLUG),
+                        'desc'       => __('One IP address per line. When a vote contains any of these entries in its IP address, it will be rejected.', WP_ULIKE_SLUG),
+                        'dependency' => array( 'blacklist_integration', 'any', 'default' )
                     )
                 ) )
             ) );
@@ -236,6 +261,12 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
             $get_content_fields['comments'] = $get_content_options;
             unset( $get_content_fields['comments']['auto_display_filter'] );
             unset( $get_content_fields['comments']['auto_display_filter_post_types'] );
+            $get_content_fields['comments']['enable_admin_columns'] = array(
+                'id'         => 'enable_admin_columns',
+                'type'       => 'switcher',
+                'title'      => __('Enable Admin Columns', WP_ULIKE_SLUG),
+                'desc'       => __('Add counter stats column to the admin comments list.', WP_ULIKE_SLUG)
+            );
 
             // Generate buddypress fields
             $get_content_fields['buddypress'] = $get_content_options;
@@ -249,9 +280,8 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
             $get_content_fields['buddypress']['enable_comments'] = array(
                 'id'         => 'enable_comments',
                 'type'       => 'switcher',
-                'title'      => __('Activity Comment', WP_ULIKE_SLUG),
-                'desc'       => __('Add the possibility to like Buddypress comments in the activity stream', WP_ULIKE_SLUG),
-                'dependency' => array( 'enable_auto_display', '==', 'true' )
+                'title'      => __('Enable Activity Comment', WP_ULIKE_SLUG),
+                'desc'       => __('Add the possibility to like Buddypress comments in the activity stream', WP_ULIKE_SLUG)
             );
             $get_content_fields['buddypress']['enable_add_bp_activity'] = array(
                 'id'         => 'enable_add_bp_activity',
@@ -289,6 +319,21 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                 'title'      => __('Enable User Notification', WP_ULIKE_SLUG),
                 'desc'       => __('Sends out notifications when you get a like from someone', WP_ULIKE_SLUG),
             );
+            $get_content_fields['buddypress']['filter_user_notification_types'] = array(
+                'id'          => 'filter_user_notification_types',
+                'type'        => 'select',
+                'title'       => __( 'Disable Notification Types',WP_ULIKE_SLUG ),
+                'desc'        => __('With this option, you can disable user notification on content types.', WP_ULIKE_SLUG),
+                'chosen'      => true,
+                'multiple'    => true,
+                'options'     => array(
+                    'post'     => __('Posts', WP_ULIKE_SLUG),
+                    'comment'  => __('Comments', WP_ULIKE_SLUG),
+                    'activity' => __('Activities', WP_ULIKE_SLUG),
+                    'topic'    => __('Topics', WP_ULIKE_SLUG)
+                ),
+                'dependency'=> array( 'enable_add_notification', '==', 'true' ),
+            );
             $buddypress_options = array( array(
                 'type'    => 'content',
                 'content' => sprintf( '<strong>%s</strong> %s', __( 'BuddyPress', WP_ULIKE_SLUG ), __( 'plugin is not installed or activated', WP_ULIKE_SLUG ) ),
@@ -315,6 +360,20 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                 'parent' => 'configuration',
                 'title'  => __( 'Content Types',WP_ULIKE_SLUG),
                 'fields' => array(
+                    array(
+                        'type'    => 'submessage',
+                        'style'   => 'info',
+                        'content' => 'In this section, you have access to the 4 types of contents in WordPress and you can specify your config for each of them:<br><br>
+                        <strong>Posts (Including all standard and custom post types + WooCommerce products)</strong><br>
+                        <strong>Comments (Including comments for all post types)</strong><br>
+                        <strong>BuddyPress (Including BuddyPress activities & comments with supporting of user notifications)</strong><br>
+                        <strong>bbPress (Including bbPress topics & replies)</strong><br><br>
+                        ' . sprintf(
+                            '<a href="%s" title="Documents" target="_blank">%s</a>',
+                            'https://docs.wpulike.com/article/14-content-types-settings',
+                            __( 'Read More', WP_ULIKE_SLUG )
+                        ),
+                    ),
                     // Posts
                     array(
                         'id'       => 'posts_group',
@@ -376,20 +435,20 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                         'type'     => 'callback',
                         'function' => 'wp_ulike_get_notice_render',
                         'args'     => array(
-                            'id'          => 'wp_ulike_pro_user_profiles_banner',
+                            'id'          => 'wp_ulike_pro_ultimate_user_profiles_banner',
                             'title'       => __( 'How to Create Ultimate User Profiles with WP ULike?', WP_ULIKE_SLUG ),
                             'description' => __( "The simplest way to create your own WordPress user profile page is by using the WP ULike Profile builder. This way, you can create professional profiles and display it on the front-end of your website without the need for coding knowledge or the use of advanced functions." , WP_ULIKE_SLUG ),
-                            'skin'        => 'info',
+                            'skin'        => 'default',
                             'has_close'   => false,
                             'buttons'     => array(
                                 array(
                                     'label'      => __( "Get More Information", WP_ULIKE_SLUG ),
-                                    'color_name' => 'info',
+                                    'color_name' => 'default',
                                     'link'       => WP_ULIKE_PLUGIN_URI . 'blog/wordpress-ultimate-profile-builder/?utm_source=settings-page-banner&utm_campaign=gopro&utm_medium=wp-dash'
                                 )
                             ),
                             'image'     => array(
-                                'width' => '200',
+                                'width' => '120',
                                 'src'   => WP_ULIKE_ASSETS_URL . '/img/svg/profiles.svg'
                             )
                         )
@@ -397,7 +456,7 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                 ) )
             ) );
 
-            // Profiles
+            // Login & Signup
             ULF::createSection( $this->option_domain, array(
                 'parent' => 'configuration',
                 'title'  => __( 'Login & Signup',WP_ULIKE_SLUG),
@@ -409,17 +468,17 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                             'id'          => 'wp_ulike_pro_user_login_register_banner',
                             'title'       => __( 'How to make AJAX Based Login/Registration system?', WP_ULIKE_SLUG ),
                             'description' => __( "Transform your default WordPress login, registration, and reset password forms with the new WP ULike Pro features. In this section, we provide you with tools that you can use to make modern & ajax based forms on your pages with just a few simple clicks." , WP_ULIKE_SLUG ),
-                            'skin'        => 'info',
+                            'skin'        => 'default',
                             'has_close'   => false,
                             'buttons'     => array(
                                 array(
                                     'label'      => __( "Get More Information", WP_ULIKE_SLUG ),
-                                    'color_name' => 'info',
+                                    'color_name' => 'default',
                                     'link'       => WP_ULIKE_PLUGIN_URI . 'blog/wordpress-ajax-login-registration-plugin/?utm_source=settings-page-banner&utm_campaign=gopro&utm_medium=wp-dash'
                                 )
                             ),
                             'image'     => array(
-                                'width' => '200',
+                                'width' => '120',
                                 'src'   => WP_ULIKE_ASSETS_URL . '/img/svg/login.svg'
                             )
                         )
@@ -427,6 +486,35 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                 ) )
             ) );
 
+            // Share buttons
+            ULF::createSection( $this->option_domain, array(
+                'parent' => 'configuration',
+                'title'  => __( 'Share Buttons',WP_ULIKE_SLUG),
+                'fields' => apply_filters( 'wp_ulike_panel_share_buttons', array(
+                    array(
+                        'type'     => 'callback',
+                        'function' => 'wp_ulike_get_notice_render',
+                        'args'     => array(
+                            'id'          => 'wp_ulike_pro_share_buttons_banner',
+                            'title'       => __( 'Easy Social Share Buttons for WordPress', WP_ULIKE_SLUG ),
+                            'description' => __( "WP ULike Share buttons enables your website users to share the content over Facebook, Twitter, Google, Linkedin, Whatsapp, Tumblr, Pinterest, Reddit and over 23 more social sharing services. This is the Simplest and Smoothest Social Sharing service with optimized and great looking vector icons." , WP_ULIKE_SLUG ),
+                            'skin'        => 'default',
+                            'has_close'   => false,
+                            'buttons'     => array(
+                                array(
+                                    'label'      => __( "Get More Information", WP_ULIKE_SLUG ),
+                                    'color_name' => 'default',
+                                    'link'       => WP_ULIKE_PLUGIN_URI . 'blog/wordpress-ultimate-social-share-buttons/?utm_source=settings-page-banner&utm_campaign=gopro&utm_medium=wp-dash'
+                                )
+                            ),
+                            'image'     => array(
+                                'width' => '120',
+                                'src'   => WP_ULIKE_ASSETS_URL . '/img/svg/share.svg'
+                            )
+                        )
+                    )
+                ) )
+            ) );
 
             /**
              * Customization Section
@@ -445,6 +533,12 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                 'title'  => __( 'Strings',WP_ULIKE_SLUG),
                 'parent' => 'translations',
                 'fields' => apply_filters( 'wp_ulike_panel_translations', array(
+                    array(
+                        'id'      => 'validate_notice',
+                        'type'    => 'text',
+                        'default' => __( 'Your vote cannot be submitted at this time.',WP_ULIKE_SLUG),
+                        'title'   => __( 'Validation Notice Message', WP_ULIKE_SLUG)
+                    ),
                     array(
                         'id'      => 'already_registered_notice',
                         'type'    => 'text',
@@ -527,17 +621,17 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                             'id'          => 'wp_ulike_pro_rest_api_banner',
                             'title'       => __( 'How to Get Started with WP ULike REST API?', WP_ULIKE_SLUG ),
                             'description' => __( "Have you ever tried to get data from online sources like WP ULike logs and use them in your Application or website? the solution is Rest API!" , WP_ULIKE_SLUG ),
-                            'skin'        => 'info',
+                            'skin'        => 'default',
                             'has_close'   => false,
                             'buttons'     => array(
                                 array(
                                     'label'      => __( "Get More Information", WP_ULIKE_SLUG ),
-                                    'color_name' => 'info',
+                                    'color_name' => 'default',
                                     'link'       => WP_ULIKE_PLUGIN_URI . 'blog/how-to-get-started-with-wp-ulike-rest-api/?utm_source=settings-page-banner&utm_campaign=gopro&utm_medium=wp-dash'
                                 )
                             ),
                             'image'     => array(
-                                'width' => '200',
+                                'width' => '120',
                                 'src'   => WP_ULIKE_ASSETS_URL . '/img/svg/api.svg'
                             )
                         )
@@ -556,17 +650,17 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                             'id'          => 'wp_ulike_pro_optimization_banner',
                             'title'       => __( 'How to Optimize or Repair WP ULike Database Tables?', WP_ULIKE_SLUG ),
                             'description' => __( "Have you ever optimized your WP ULike database? Optimizing your database cleans up unwanted data which reduces database size and improves performance." , WP_ULIKE_SLUG ),
-                            'skin'        => 'info',
+                            'skin'        => 'default',
                             'has_close'   => false,
                             'buttons'     => array(
                                 array(
                                     'label'      => __( "Get More Information", WP_ULIKE_SLUG ),
-                                    'color_name' => 'info',
+                                    'color_name' => 'default',
                                     'link'       => WP_ULIKE_PLUGIN_URI . 'blog/database-optimization/?utm_source=settings-page-banner&utm_campaign=gopro&utm_medium=wp-dash'
                                 )
                             ),
                             'image'     => array(
-                                'width' => '200',
+                                'width' => '120',
                                 'src'   => WP_ULIKE_ASSETS_URL . '/img/svg/database.svg'
                             )
                         )
@@ -744,7 +838,25 @@ if ( ! class_exists( 'wp_ulike_admin_panel' ) ) {
                         'by_user_ip_cookie' => __('Username/IP + Cookie', WP_ULIKE_SLUG)
                     ),
                     'default'     => 'by_username',
-                    'help'        => sprintf( '<p>%s</p><p>%s</p><p>%s</p>', __( '"No Limit": There will be no restrictions and users can submit their points each time they refresh the page. In this option, it will not be possible to resubmit reverse points (un-like/un-dislike).', WP_ULIKE_SLUG ), __( '"Cookie": By saving users\' cookies, it is possible to submit points only once per user and in case of re-clicking, the appropriate message will be displayed.', WP_ULIKE_SLUG ), __( 'Username/IP: By saving the username/IP of users, It supports the reverse feature  (un-like and un-dislike) and users can change their reactions and are only allowed to have a specific point type.', WP_ULIKE_SLUG ) )
+                    'help'        => sprintf( '<p>%s</p><p>%s</p><p>%s</p><p>%s</p>', __( '"No Limit": There will be no restrictions and users can submit their points each time they refresh the page. In this option, it will not be possible to resubmit reverse points (un-like/un-dislike).', WP_ULIKE_SLUG ), __( '"Cookie": By saving users\' cookies, it is possible to submit points only once per user and in case of re-clicking, the appropriate message will be displayed.', WP_ULIKE_SLUG ), __( 'Username/IP: By saving the username/IP of users, It supports the reverse feature  (un-like and un-dislike) and users can change their reactions and are only allowed to have a specific point type.', WP_ULIKE_SLUG ), __( 'Username/IP + Cookie: Same as username/IP description, However, if the user IP or username changes and the cookie is set, it does not allow the user to like /dislike.', WP_ULIKE_SLUG )  )
+                ),
+                'cookie_expires' => array(
+                    'id'         => 'cookie_expires',
+                    'type'       => 'number',
+                    'title'      => __( 'Cookie Expiration', WP_ULIKE_SLUG),
+                    'desc'       => __('Specify how long, in seconds, cookie expires. Default value: 31536000', WP_ULIKE_SLUG),
+                    'default'    => 31536000,
+                    'dependency' => array( 'logging_method', 'any', 'by_cookie,by_user_ip_cookie' ),
+                ),
+                'vote_limit_number' => array(
+                    'id'         => 'vote_limit_number',
+                    'type'       => 'spinner',
+                    'title'      => __( 'Vote Limit Per Day', WP_ULIKE_SLUG),
+                    'desc'       => __('Limits the number of votes that can be submitted by user on each item per day.', WP_ULIKE_SLUG),
+                    'default'    => 10,
+                    'min'        => 1,
+                    'max'        => 1000,
+                    'dependency' => array( 'logging_method', '==', 'do_not_log' ),
                 ),
                 'enable_only_logged_in_users' => array(
                     'id'    => 'enable_only_logged_in_users',

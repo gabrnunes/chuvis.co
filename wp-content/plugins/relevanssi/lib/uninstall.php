@@ -26,6 +26,7 @@ function relevanssi_drop_database_tables() {
 	$relevanssi_table = $wpdb->prefix . 'relevanssi';
 	$stopword_table   = $wpdb->prefix . 'relevanssi_stopwords';
 	$log_table        = $wpdb->prefix . 'relevanssi_log';
+	$tracking_table   = $wpdb->prefix . 'relevanssi_tracking';
 
 	// phpcs:disable WordPress.DB.PreparedSQL
 	if ( $wpdb->get_var( "SHOW TABLES LIKE '$stopword_table'" ) === $stopword_table ) {
@@ -39,6 +40,10 @@ function relevanssi_drop_database_tables() {
 	if ( $wpdb->get_var( "SHOW TABLES LIKE '$log_table'" ) === $log_table ) {
 		$wpdb->query( "DROP TABLE $log_table" );
 	}
+
+	if ( $wpdb->get_var( "SHOW TABLES LIKE '$tracking_table'" ) === $tracking_table ) {
+		$wpdb->query( "DROP TABLE $tracking_table" );
+	}
 	// phpcs:enable WordPress.DB.PreparedSQL
 }
 
@@ -50,6 +55,11 @@ function relevanssi_drop_database_tables() {
  * @global object $wpdb The WordPress database interface.
  */
 function relevanssi_uninstall_free() {
+	if ( defined( 'RELEVANSSI_PREMIUM' ) && RELEVANSSI_PREMIUM && ! defined( 'UNINSTALLING_RELEVANSSI_PREMIUM' ) ) {
+		// Relevanssi Premium exists, do not drop the tables.
+		return;
+	}
+
 	delete_option( 'relevanssi_admin_search' );
 	delete_option( 'relevanssi_bg_col' );
 	delete_option( 'relevanssi_cat' );
@@ -100,6 +110,7 @@ function relevanssi_uninstall_free() {
 	delete_option( 'relevanssi_post_type_weights' );
 	delete_option( 'relevanssi_punctuation' );
 	delete_option( 'relevanssi_respect_exclude' );
+	delete_option( 'relevanssi_seo_noindex' );
 	delete_option( 'relevanssi_show_matches' );
 	delete_option( 'relevanssi_show_matches_text' );
 	delete_option( 'relevanssi_show_post_controls' );

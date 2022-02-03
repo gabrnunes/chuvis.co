@@ -91,7 +91,7 @@ function _relevanssi_install() {
 	add_option( 'relevanssi_expand_highlights', 'off' );
 	add_option( 'relevanssi_expand_shortcodes', 'on' );
 	add_option( 'relevanssi_extag', '0' );
-	add_option( 'relevanssi_fuzzy', 'sometimes' );
+	add_option( 'relevanssi_fuzzy', 'always' );
 	add_option( 'relevanssi_highlight', 'strong' );
 	add_option( 'relevanssi_highlight_comments', 'off' );
 	add_option( 'relevanssi_highlight_docs', 'off' );
@@ -119,6 +119,7 @@ function _relevanssi_install() {
 		)
 	);
 	add_option( 'relevanssi_respect_exclude', 'on' );
+	add_option( 'relevanssi_seo_noindex', 'on' );
 	add_option( 'relevanssi_show_matches', '' );
 	add_option( 'relevanssi_show_matches_text', '(Search hits: %body% in body, %title% in title, %categories% in categories, %tags% in tags, %taxonomies% in other taxonomies, %comments% in comments. Score: %score%)' );
 	add_option( 'relevanssi_stopwords', array() );

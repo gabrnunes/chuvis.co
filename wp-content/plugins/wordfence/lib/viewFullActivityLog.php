@@ -7,8 +7,9 @@
 <style type="text/css">
 
 </style>
+</head>
 <body>
-<h1>Wordfence Full Activity Log</h1>
+<h1><?php esc_html_e('Wordfence Full Activity Log', 'wordfence') ?></h1>
 <?php
 $db = new wfDB();
 global $wpdb;
@@ -20,7 +21,7 @@ $q = $db->querySelect("SELECT ctime, level, type, msg FROM {$table} ORDER BY cti
 while (is_array($q) && count($q) > 0) {
 	foreach($q as $r){
 		if($r['level'] < 4 || $debugOn){
-			echo '<div' . ($r['type'] == 'error' ? ' class="error"' : '') . '>[' . date('M d H:i:s', $r['ctime'] + $timeOffset) . ':' . $r['ctime'] . ':' . $r['level'] . ':' . $r['type'] . ']&nbsp;' . esc_html($r['msg']) . "</div>\n";
+			echo '<div' . ($r['type'] == 'error' ? ' class="error"' : '') . '>[' . date('M d H:i:s', (int) $r['ctime'] + $timeOffset) . ':' . $r['ctime'] . ':' . $r['level'] . ':' . $r['type'] . ']&nbsp;' . esc_html($r['msg']) . "</div>\n";
 		}
 	}
 	$offset += count($q);

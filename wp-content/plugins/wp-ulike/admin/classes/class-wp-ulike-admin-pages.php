@@ -3,7 +3,7 @@
  * Wp ULike Admin Pages Class.
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2021
+ * @author     TechnoWich 2022
  * @link       https://wpulike.com
 */
 

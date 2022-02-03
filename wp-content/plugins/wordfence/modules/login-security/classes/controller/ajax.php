@@ -6,6 +6,9 @@ use WordfenceLS\Crypto\Model_JWT;
 use WordfenceLS\Crypto\Model_Symmetric;
 
 class Controller_AJAX {
+
+	const MAX_USERS_TO_NOTIFY = 100;
+
 	protected $_actions = null; //Populated on init
 	
 	/**
@@ -35,7 +38,7 @@ class Controller_AJAX {
 				'nopriv' => true,
 				'nonce' => false,
 				'permissions' => array(),
-				'required_parameters' => array('user_login', 'user_email', 'wfls-message-nonce', 'wfls-message'),
+				'required_parameters' => array('wfls-message-nonce', 'wfls-message'),
 			),
 			'activate' => array(
 				'handler' => array($this, '_ajax_activate_callback'),
@@ -77,6 +80,31 @@ class Controller_AJAX {
 				'permissions' => array(Controller_Permissions::CAP_MANAGE_SETTINGS => __('You do not have permission to reset reCAPTCHA statistics.', 'wordfence-2fa')),
 				'required_parameters' => array('nonce'),
 			),
+			'reset_2fa_grace_period' => array (
+				'handler' => array($this, '_ajax_reset_2fa_grace_period_callback'),
+				'permissions' => array(Controller_Permissions::CAP_MANAGE_SETTINGS => __('You do not have permission to reset the 2FA grace period.', 'wordfence-2fa')),
+				'required_parameters' => array('nonce', 'user_id')
+			),
+			'revoke_2fa_grace_period' => array (
+				'handler' => array($this, '_ajax_revoke_2fa_grace_period_callback'),
+				'permissions' => array(Controller_Permissions::CAP_MANAGE_SETTINGS => __('You do not have permission to revoke the 2FA grace period.', 'wordfence-2fa')),
+				'required_parameters' => array('nonce', 'user_id')
+			),
+			'reset_ntp_failure_count' => array(
+				'handler' => array($this, '_ajax_reset_ntp_failure_count_callback'),
+				'permissions' => array(Controller_Permissions::CAP_MANAGE_SETTINGS => __('You do not have permission to reset the NTP failure count.', 'wordfence-2fa')),
+				'required_parameters' => array(),
+			),
+			'disable_ntp' => array(
+				'handler' => array($this, '_ajax_disable_ntp_callback'),
+				'permissions' => array(Controller_Permissions::CAP_MANAGE_SETTINGS => __('You do not have permission to disable NTP.', 'wordfence-2fa')),
+				'required_parameters' => array(),
+			),
+			'dismiss_persistent_notice' => array(
+				'handler' => array($this, '_ajax_dismiss_persistent_notice_callback'),
+				'permissions' => array(Controller_Permissions::CAP_MANAGE_SETTINGS => __('You do not have permission to dismiss this notice.', 'wordfence-2fa')),
+				'required_parameters' => array('nonce', 'notice_id')
+			)
 		);
 		
 		$this->_init_actions();
@@ -105,17 +133,17 @@ class Controller_AJAX {
 	
 	public function _ajax_handler() {
 		$action = (isset($_POST['action']) && is_string($_POST['action']) && $_POST['action']) ? $_POST['action'] : $_GET['action'];
-		if (preg_match('~wordfence_ls_([a-zA-Z_]+)$~', $action, $matches)) {
+		if (preg_match('~wordfence_ls_([a-zA-Z_0-9]+)$~', $action, $matches)) {
 			$action = $matches[1];
 			if (!isset($this->_actions[$action])) {
-				self::send_json(array('error' => __('An unknown action was provided.', 'wordfence-2fa')));
+				self::send_json(array('error' => esc_html__('An unknown action was provided.', 'wordfence-2fa')));
 			}
 			
 			$parameters = $this->_actions[$action];
 			if (!empty($parameters['required_parameters'])) {
 				foreach ($parameters['required_parameters'] as $k) {
 					if (!isset($_POST[$k])) {
-						self::send_json(array('error' => __('An expected parameter was not provided.', 'wordfence-2fa')));
+						self::send_json(array('error' => esc_html__('An expected parameter was not provided.', 'wordfence-2fa')));
 					}
 				}
 			}
@@ -123,7 +151,7 @@ class Controller_AJAX {
 			if (!isset($parameters['nonce']) || $parameters['nonce']) {
 				$nonce = (isset($_POST['nonce']) && is_string($_POST['nonce']) && $_POST['nonce']) ? $_POST['nonce'] : $_GET['nonce'];
 				if (!is_string($nonce) || !wp_verify_nonce($nonce, 'wp-ajax')) {
-					self::send_json(array('error' => __('Your browser sent an invalid security token. Please try reloading this page.', 'wordfence-2fa'), 'tokenInvalid' => 1));
+					self::send_json(array('error' => esc_html__('Your browser sent an invalid security token. Please try reloading this page.', 'wordfence-2fa'), 'tokenInvalid' => 1));
 				}
 			}
 			
@@ -141,8 +169,21 @@ class Controller_AJAX {
 	}
 	
 	public function _ajax_authenticate_callback() {
-		if (!isset($_POST['log']) || !is_string($_POST['log']) || empty($_POST['log']) || !isset($_POST['pwd']) || !is_string($_POST['pwd']) || empty($_POST['pwd'])) {
-			self::send_json(array('error' => sprintf(__('<strong>ERROR</strong>: A username and password must be provided. <a href="%s" title="Password Lost and Found">Lost your password</a>?'), wp_lostpassword_url())));
+		$credentialKeys = array(
+			'log' => 'pwd',
+			'username' => 'password'
+		);
+		$username = null;
+		$password = null;
+		foreach ($credentialKeys as $usernameKey => $passwordKey) {
+			if (array_key_exists($usernameKey, $_POST) && array_key_exists($passwordKey, $_POST) && is_string($_POST[$usernameKey]) && is_string($_POST[$passwordKey])) {
+				$username = $_POST[$usernameKey];
+				$password = $_POST[$passwordKey];
+				break;
+			}
+		}
+		if (empty($username) || empty($password)) {
+			self::send_json(array('error' => wp_kses(sprintf(__('<strong>ERROR</strong>: A username and password must be provided. <a href="%s" title="Password Lost and Found">Lost your password</a>?'), wp_lostpassword_url()), array('strong'=>array(), 'a'=>array('href'=>array(), 'title'=>array())))));
 		}
 		
 		$legacy2FAActive = Controller_WordfenceLS::shared()->legacy_2fa_active();
@@ -150,8 +191,6 @@ class Controller_AJAX {
 			self::send_json(array('login' => 1));
 		}
 		
-		$username = $_POST['log'];
-		$password = $_POST['pwd'];
 		do_action_ref_array('wp_authenticate', array(&$username, &$password));
 		
 		define('WORDFENCE_LS_AUTHENTICATION_CHECK', true); //Prevents our auth filter from recursing
@@ -192,7 +231,7 @@ class Controller_AJAX {
 			$reset = false;
 			foreach ($user->get_error_codes() as $code) {
 				if ($code == 'invalid_username' || $code == 'invalid_email' || $code == 'incorrect_password' || $code == 'authentication_failed') {
-					$errors[] = sprintf(__('<strong>ERROR</strong>: The username or password you entered is incorrect. <a href="%s" title="Password Lost and Found">Lost your password</a>?'), wp_lostpassword_url());
+					$errors[] = wp_kses(sprintf(__('<strong>ERROR</strong>: The username or password you entered is incorrect. <a href="%s" title="Password Lost and Found">Lost your password</a>?'), wp_lostpassword_url()), array('strong'=>array(), 'a'=>array('href'=>array(), 'title'=>array())));
 				}
 				else {
 					if ($code == 'wfls_twofactor_invalid') {
@@ -224,24 +263,33 @@ class Controller_AJAX {
 			}
 		}
 		
-		self::send_json(array('error' => sprintf(__('<strong>ERROR</strong>: The username or password you entered is incorrect. <a href="%s" title="Password Lost and Found">Lost your password</a>?'), wp_lostpassword_url())));
+		self::send_json(array('error' => wp_kses(sprintf(__('<strong>ERROR</strong>: The username or password you entered is incorrect. <a href="%s" title="Password Lost and Found">Lost your password</a>?'), wp_lostpassword_url()), array('strong'=>array(), 'a'=>array('href'=>array(), 'title'=>array())))));
 	}
 	
 	public function _ajax_register_support_callback() {
-		if (!isset($_POST['user_login']) || !is_string($_POST['user_login']) ||
-			!isset($_POST['user_email']) || !is_string($_POST['user_email']) ||
+		$email = null;
+		if (array_key_exists('email', $_POST) && is_string($_POST['email'])) {
+			$email = $_POST['email'];
+		}
+		else if (array_key_exists('user_email', $_POST) && is_string($_POST['user_email'])) {
+			$email = $_POST['user_email'];
+		}
+		if (
+			$email === null ||
 			!isset($_POST['wfls-message']) || !is_string($_POST['wfls-message']) ||
 			!isset($_POST['wfls-message-nonce']) || !is_string($_POST['wfls-message-nonce'])) {
-			self::send_json(array('error' => sprintf(__('<strong>ERROR</strong>: Unable to send message. Please refresh the page and try again.'))));
+			self::send_json(array('error' => wp_kses(sprintf(__('<strong>ERROR</strong>: Unable to send message. Please refresh the page and try again.')), array('strong'=>array()))));
 		}
 		
-		$login = sanitize_user($_POST['user_login']);
-		$email = sanitize_email($_POST['user_email']);
+		$email = sanitize_email($email);
+		$login = '';
+		if (array_key_exists('user_login', $_POST) && is_string($_POST['user_login']))
+			$login = sanitize_user($_POST['user_login']);
 		$message = strip_tags($_POST['wfls-message']);
 		$nonce = $_POST['wfls-message-nonce'];
-		
-		if (empty($login) || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL) || empty($message)) {
-			self::send_json(array('error' => sprintf(__('<strong>ERROR</strong>: Unable to send message. Please refresh the page and try again.'))));
+
+		if ((isset($_POST['user_login']) && empty($login)) || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL) || empty($message)) {
+			self::send_json(array('error' => wp_kses(sprintf(__('<strong>ERROR</strong>: Unable to send message. Please refresh the page and try again.')), array('strong'=>array()))));
 		}
 		
 		$jwt = Model_JWT::decode_jwt($_POST['wfls-message-nonce']);
@@ -249,13 +297,13 @@ class Controller_AJAX {
 			$decryptedIP = Model_Symmetric::decrypt($jwt->payload['ip']);
 			$decryptedScore = Model_Symmetric::decrypt($jwt->payload['score']);
 			if ($decryptedIP === false || $decryptedScore === false || Model_IP::inet_pton($decryptedIP) !== Model_IP::inet_pton(Model_Request::current()->ip())) { //JWT IP and the current request's IP don't match, refuse the message
-				self::send_json(array('error' => sprintf(__('<strong>ERROR</strong>: Unable to send message. Please refresh the page and try again.'))));
+				self::send_json(array('error' => wp_kses(sprintf(__('<strong>ERROR</strong>: Unable to send message. Please refresh the page and try again.')), array('strong'=>array()))));
 			}
 			
 			$identifier = bin2hex(Model_IP::inet_pton($decryptedIP));
 			$tokenBucket = new Model_TokenBucket('rate:' . $identifier, 2, 1 / (6 * Model_TokenBucket::HOUR)); //Maximum of two requests, refilling at a rate of one per six hours
 			if (!$tokenBucket->consume(1)) {
-				self::send_json(array('error' => sprintf(__('<strong>ERROR</strong>: Unable to send message. You have exceeded the maximum number of messages that may be sent at this time. Please try again later.'))));
+				self::send_json(array('error' => wp_kses(sprintf(__('<strong>ERROR</strong>: Unable to send message. You have exceeded the maximum number of messages that may be sent at this time. Please try again later.')), array('strong'=>array()))));
 			}
 			
 			$email = array(
@@ -266,13 +314,13 @@ class Controller_AJAX {
 			);
 			$success = wp_mail($email['to'], $email['subject'], $email['body'], $email['headers']);
 			if ($success) {
-				self::send_json(array('message' => sprintf(__('<strong>MESSAGE SENT</strong>: Your message was sent to the site owner.'))));
+				self::send_json(array('message' => wp_kses(sprintf(__('<strong>MESSAGE SENT</strong>: Your message was sent to the site owner.')), array('strong'=>array()))));
 			}
 			
-			self::send_json(array('error' => sprintf(__('<strong>ERROR</strong>: An error occurred while sending the message. Please try again.'))));
+			self::send_json(array('error' => wp_kses(sprintf(__('<strong>ERROR</strong>: An error occurred while sending the message. Please try again.')), array('strong'=>array()))));
 		}
 		
-		self::send_json(array('error' => sprintf(__('<strong>ERROR</strong>: Unable to send message. Please refresh the page and try again.'))));
+		self::send_json(array('error' => wp_kses(sprintf(__('<strong>ERROR</strong>: Unable to send message. Please refresh the page and try again.')), array('strong'=>array()))));
 	}
 	
 	public function _ajax_activate_callback() {
@@ -280,31 +328,31 @@ class Controller_AJAX {
 		$user = wp_get_current_user();
 		if ($user->ID != $userID) {
 			if (!user_can($user, Controller_Permissions::CAP_ACTIVATE_2FA_OTHERS)) {
-				self::send_json(array('error' => __('You do not have permission to activate the given user.', 'wordfence-2fa')));
+				self::send_json(array('error' => esc_html__('You do not have permission to activate the given user.', 'wordfence-2fa')));
 			}
 			else {
 				$user = new \WP_User($userID);
 				if (!$user->exists()) {
-					self::send_json(array('error' => __('The given user does not exist.', 'wordfence-2fa')));
+					self::send_json(array('error' => esc_html__('The given user does not exist.', 'wordfence-2fa')));
 				}
 			}
 		}
 		else if (!user_can($user, Controller_Permissions::CAP_ACTIVATE_2FA_SELF)) {
-			self::send_json(array('error' => __('You do not have permission to activate 2FA.', 'wordfence-2fa')));
+			self::send_json(array('error' => esc_html__('You do not have permission to activate 2FA.', 'wordfence-2fa')));
 		}
 		
 		if (Controller_Users::shared()->has_2fa_active($user)) {
-			self::send_json(array('error' => __('The given user already has two-factor authentication active.', 'wordfence-2fa')));
+			self::send_json(array('error' => esc_html__('The given user already has two-factor authentication active.', 'wordfence-2fa')));
 		}
 		
 		$matches = (isset($_POST['secret']) && isset($_POST['code']) && is_string($_POST['secret']) && is_string($_POST['code']) && Controller_TOTP::shared()->check_code($_POST['secret'], $_POST['code']));
 		if ($matches === false) {
-			self::send_json(array('error' => __('The code provided does not match the expected value. Please verify that the time on your authenticator device is correct and that this server\'s time is correct.', 'wordfence-2fa')));
+			self::send_json(array('error' => esc_html__('The code provided does not match the expected value. Please verify that the time on your authenticator device is correct and that this server\'s time is correct.', 'wordfence-2fa')));
 		}
 		
 		Controller_TOTP::shared()->activate_2fa($user, $_POST['secret'], $_POST['recovery'], $matches);
 		Controller_Notices::shared()->remove_notice(false, 'wfls-will-be-required', $user);
-		self::send_json(array('activated' => 1, 'text' => sprintf(count($_POST['recovery']) == 1 ? __('%d unused recovery code remains. You may generate a new set by clicking below.', 'wordfence-2fa') : __('%d unused recovery codes remain. You may generate a new set by clicking below.', 'wordfence-2fa'), count($_POST['recovery']))));
+		self::send_json(array('activated' => 1, 'text' => sprintf(count($_POST['recovery']) == 1 ? esc_html__('%d unused recovery code remains. You may generate a new set by clicking below.', 'wordfence-2fa') : esc_html__('%d unused recovery codes remain. You may generate a new set by clicking below.', 'wordfence-2fa'), count($_POST['recovery']))));
 	}
 	
 	public function _ajax_deactivate_callback() {
@@ -312,21 +360,21 @@ class Controller_AJAX {
 		$user = wp_get_current_user();
 		if ($user->ID != $userID) {
 			if (!user_can($user, Controller_Permissions::CAP_ACTIVATE_2FA_OTHERS)) {
-				self::send_json(array('error' => __('You do not have permission to deactivate the given user.', 'wordfence-2fa')));
+				self::send_json(array('error' => esc_html__('You do not have permission to deactivate the given user.', 'wordfence-2fa')));
 			}
 			else {
 				$user = new \WP_User($userID);
 				if (!$user->exists()) {
-					self::send_json(array('error' => __('The user does not exist.', 'wordfence-2fa')));
+					self::send_json(array('error' => esc_html__('The user does not exist.', 'wordfence-2fa')));
 				}
 			}
 		}
 		else if (!user_can($user, Controller_Permissions::CAP_ACTIVATE_2FA_SELF)) {
-			self::send_json(array('error' => __('You do not have permission to deactivate 2FA.', 'wordfence-2fa')));
+			self::send_json(array('error' => esc_html__('You do not have permission to deactivate 2FA.', 'wordfence-2fa')));
 		}
 		
 		if (!Controller_Users::shared()->has_2fa_active($user)) {
-			self::send_json(array('error' => __('The user specified does not have two-factor authentication active.', 'wordfence-2fa')));
+			self::send_json(array('error' => esc_html__('The user specified does not have two-factor authentication active.', 'wordfence-2fa')));
 		}
 		
 		Controller_Users::shared()->deactivate_2fa($user);
@@ -338,25 +386,25 @@ class Controller_AJAX {
 		$user = wp_get_current_user();
 		if ($user->ID != $userID) {
 			if (!user_can($user, Controller_Permissions::CAP_ACTIVATE_2FA_OTHERS)) {
-				self::send_json(array('error' => __('You do not have permission to generate new recovery codes for the given user.', 'wordfence-2fa')));
+				self::send_json(array('error' => esc_html__('You do not have permission to generate new recovery codes for the given user.', 'wordfence-2fa')));
 			}
 			else {
 				$user = new \WP_User($userID);
 				if (!$user->exists()) {
-					self::send_json(array('error' => __('The user does not exist.', 'wordfence-2fa')));
+					self::send_json(array('error' => esc_html__('The user does not exist.', 'wordfence-2fa')));
 				}
 			}
 		}
 		else if (!user_can($user, Controller_Permissions::CAP_ACTIVATE_2FA_SELF)) {
-			self::send_json(array('error' => __('You do not have permission to generate new recovery codes.', 'wordfence-2fa')));
+			self::send_json(array('error' => esc_html__('You do not have permission to generate new recovery codes.', 'wordfence-2fa')));
 		}
 		
 		if (!Controller_Users::shared()->has_2fa_active($user)) {
-			self::send_json(array('error' => __('The user specified does not have two-factor authentication active.', 'wordfence-2fa')));
+			self::send_json(array('error' => esc_html__('The user specified does not have two-factor authentication active.', 'wordfence-2fa')));
 		}
 		
 		$codes = Controller_Users::shared()->regenerate_recovery_codes($user);
-		self::send_json(array('regenerated' => 1, 'recovery' => array_map(function($r) { return implode(' ', str_split(bin2hex($r), 4)); }, $codes), 'text' => sprintf(count($codes) == 1 ? __('%d unused recovery code remains. You may generate a new set by clicking below.', 'wordfence-2fa') : __('%d unused recovery codes remain. You may generate a new set by clicking below.', 'wordfence-2fa'), count($codes))));
+		self::send_json(array('regenerated' => 1, 'recovery' => array_map(function($r) { return implode(' ', str_split(bin2hex($r), 4)); }, $codes), 'text' => sprintf(count($codes) == 1 ? esc_html__('%d unused recovery code remains. You may generate a new set by clicking below.', 'wordfence-2fa') : esc_html__('%d unused recovery codes remain. You may generate a new set by clicking below.', 'wordfence-2fa'), count($codes))));
 	}
 	
 	public function _ajax_save_options_callback() {
@@ -366,7 +414,7 @@ class Controller_AJAX {
 				if ($errors !== true) {
 					if (count($errors) == 1) {
 						$e = array_shift($errors);
-						self::send_json(array('error' => sprintf(__('An error occurred while saving the configuration: %s', 'wordfence-2fa'), $e)));
+						self::send_json(array('error' => esc_html(sprintf(__('An error occurred while saving the configuration: %s', 'wordfence-2fa'), $e))));
 					}
 					else if (count($errors) > 1) {
 						$compoundMessage = array();
@@ -374,13 +422,13 @@ class Controller_AJAX {
 							$compoundMessage[] = esc_html($e);
 						}
 						self::send_json(array(
-							'error' => sprintf(__('Errors occurred while saving the configuration: %s', 'wordfence-2fa'), '<ul><li>' . implode('</li><li>', $compoundMessage) . '</li></ul>'),
+							'error' => wp_kses(sprintf(__('Errors occurred while saving the configuration: %s', 'wordfence-2fa'), '<ul><li>' . implode('</li><li>', $compoundMessage) . '</li></ul>'), array('ul'=>array(), 'li'=>array())),
 							'html' => true,
 						));
 					}
 					
 					self::send_json(array(
-						'error' => __('Errors occurred while saving the configuration.', 'wordfence-2fa'),
+						'error' => esc_html__('Errors occurred while saving the configuration.', 'wordfence-2fa'),
 					));
 				}
 				
@@ -397,41 +445,44 @@ class Controller_AJAX {
 		}
 		
 		self::send_json(array(
-			'error' => __('No configuration changes were provided to save.', 'wordfence'),
+			'error' => esc_html__('No configuration changes were provided to save.', 'wordfence'),
 		));
 	}
 	
 	public function _ajax_send_grace_period_notification_callback() {
-		if (!Controller_Settings::shared()->get_bool(Controller_Settings::OPTION_REQUIRE_2FA_ADMIN)) {
-			self::send_json(array('error' => __('Two-factor authentication is not currently required for administrators.', 'wordfence-2fa')));
-		}
-		
-		if (!(Controller_Settings::shared()->get_bool(Controller_Settings::OPTION_REQUIRE_2FA_GRACE_PERIOD_ENABLED) && \WordfenceLS\Controller_Time::time() < Controller_Settings::shared()->get_int(Controller_Settings::OPTION_REQUIRE_2FA_GRACE_PERIOD))) {
-			self::send_json(array('error' => __('A valid grace period is not configured to allow administrators time to activate two-factor authentication.', 'wordfence-2fa')));
-		}
-		
-		$subject = sprintf(__('2FA will soon be required on %s', 'wordfence-2fa'), home_url());
-		$message = sprintf(__("You do not currently have two-factor authentication active on your account, which will be required beginning %s.\n\nConfigure 2FA: %s", 'wordfence-2fa'), Controller_Time::format_local_time('F j, Y', Controller_Settings::shared()->get_int(Controller_Settings::OPTION_REQUIRE_2FA_GRACE_PERIOD)), admin_url('admin.php?page=WFLS'));
-		
-		$admins = Controller_Users::shared()->admin_users();
+		$notifyAll = isset($_POST['notify_all']);
+		$users = Controller_Users::shared()->get_users_by_role($_POST['role'], $notifyAll ? null: self::MAX_USERS_TO_NOTIFY + 1);
+		$userCount = count($users);
+		if (!$notifyAll && $userCount > self::MAX_USERS_TO_NOTIFY)
+			self::send_json(array('error' => esc_html(sprintf(__('More than %d users exist for the selected role. This notification is not designed to handle large groups of users. In such instances, using a different solution for notifying users of upcoming 2FA requirements is recommended.', 'wordfence-2fa'), self::MAX_USERS_TO_NOTIFY)), 'limit_exceeded' => true));
 		$sent = 0;
-		foreach ($admins as $a) {
-			/** @var \WP_User $a */
-			if (Controller_Users::shared()->has_2fa_active($a)) {
-				continue;
+		foreach ($users as $user) {
+			Controller_Users::shared()->requires_2fa($user, $inGracePeriod, $requiredAt);
+			if ($inGracePeriod && !Controller_Users::shared()->has_2fa_active($user)) {
+				$subject = sprintf(__('2FA will soon be required on %s', 'wordfence-2fa'), home_url());
+				$requiredDate = Controller_Time::format_local_time('F j, Y g:i A', $requiredAt);
+
+				$message = sprintf(
+					__("You do not currently have two-factor authentication active on your account, which will be required beginning %s.\n\nConfigure 2FA: %s", 'wordfence-2fa'),
+					$requiredDate,
+					(is_multisite() && is_super_admin($user->ID)) ? network_admin_url('admin.php?page=WFLS') : admin_url('admin.php?page=WFLS')
+				);
+				
+				wp_mail($user->user_email, $subject, $message);
+				$sent++;
 			}
-			
-			wp_mail($a->user_email, $subject, $message);
-			$sent++;
 		}
-		
-		if ($sent == 0) {
-			self::send_json(array('confirmation' => __('All administrators already have two-factor authenication activated.', 'wordfence-2fa')));
+
+		if ($userCount == 0) {
+			self::send_json(array('error' => esc_html__('No users currently exist with the selected role.', 'wordfence-2fa')));
+		}
+		else if ($sent == 0) {
+			self::send_json(array('confirmation' => esc_html__('All users with the selected role already have two-factor authentication activated or have been locked out.', 'wordfence-2fa')));
 		}
 		else if ($sent == 1) {
-			self::send_json(array('confirmation' => sprintf(__('A reminder to activate two-factor authentication was sent to %d administrator.', 'wordfence-2fa'), $sent)));
+			self::send_json(array('confirmation' => esc_html(sprintf(__('A reminder to activate two-factor authentication was sent to %d user.', 'wordfence-2fa'), $sent))));
 		}
-		self::send_json(array('confirmation' => sprintf(__('A reminder to activate two-factor authentication was sent to %d administrators.', 'wordfence-2fa'), $sent)));
+		self::send_json(array('confirmation' => esc_html(sprintf(__('A reminder to activate two-factor authentication was sent to %d users.', 'wordfence-2fa'), $sent))));
 	}
 	
 	public function _ajax_update_ip_preview_callback() {
@@ -469,5 +520,47 @@ class Controller_AJAX {
 		Controller_Settings::shared()->set_array(Controller_Settings::OPTION_CAPTCHA_STATS, array('counts' => array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), 'avg' => 0));
 		$response = array('success' => true);
 		self::send_json($response);
+	}
+
+	public function _ajax_reset_2fa_grace_period_callback() {
+		$userId = (int) $_POST['user_id'];
+		$gracePeriodOverride = array_key_exists('grace_period_override', $_POST) ? (int) $_POST['grace_period_override'] : null;
+		$user = get_userdata($userId);
+		if ($user === false)
+			self::send_json(array('error' => esc_html__('Invalid user specified', 'wordfence-2fa')));
+		if ($gracePeriodOverride < 0 || $gracePeriodOverride > Controller_Settings::MAX_REQUIRE_2FA_USER_GRACE_PERIOD)
+			self::send_json(array('error' => esc_html__('Invalid grace period override', 'wordfence-2fa')));
+		$gracePeriodAllowed = Controller_Users::shared()->get_grace_period_allowed_flag($userId);
+		if (!$gracePeriodAllowed)
+			Controller_Users::shared()->allow_grace_period($userId);
+		if (!Controller_Users::shared()->reset_2fa_grace_period($user, $gracePeriodOverride))
+			self::send_json(array('error' => esc_html__('Failed to reset grace period', 'wordfence-2fa')));
+		self::send_json(array('success' => true));
+	}
+
+	public function _ajax_revoke_2fa_grace_period_callback() {
+		$user = get_userdata((int) $_POST['user_id']);
+		if ($user === false)
+			self::send_json(array('error' => esc_html__('Invalid user specified', 'wordfence-2fa')));
+		Controller_Users::shared()->revoke_grace_period($user);
+		self::send_json(array('success' => true));
+	}
+
+	public function _ajax_reset_ntp_failure_count_callback() {
+		Controller_Settings::shared()->reset_ntp_failure_count();
+	}
+
+	public function _ajax_disable_ntp_callback() {
+		Controller_Settings::shared()->disable_ntp_cron();
+	}
+
+	public function _ajax_dismiss_persistent_notice_callback() {
+		$userId = get_current_user_id();
+		$noticeId = $_POST['notice_id'];
+		if ($userId !== 0 && Controller_Notices::shared()->dismiss_persistent_notice($userId, $noticeId))
+			self::send_json(array('success' => true));
+		self::send_json(array(
+			'error' => esc_html__('Unable to dismiss notice', 'wordfence')
+		));
 	}
 }

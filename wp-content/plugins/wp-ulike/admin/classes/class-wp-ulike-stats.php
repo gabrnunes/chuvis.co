@@ -3,7 +3,7 @@
  * Class for statistics process
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2021
+ * @author     TechnoWich 2022
  * @link       https://wpulike.com
  */
 
@@ -134,7 +134,7 @@ if ( ! class_exists( 'wp_ulike_stats' ) ) {
 						'backgroundColor'      => "rgba(66, 165, 245,0.8)",
 						'borderColor'          => "rgba(21, 101, 192,1)",
 						'pointBackgroundColor' => "rgba(255,255,255,1)",
-						'borderWidth'          => 1
+						'borderWidth'          => 2
 					);
 					break;
 
@@ -144,7 +144,7 @@ if ( ! class_exists( 'wp_ulike_stats' ) ) {
 						'backgroundColor'      => "rgba(255, 202, 40,0.8)",
 						'borderColor'          => "rgba(255, 143, 0,1)",
 						'pointBackgroundColor' => "rgba(255,255,255,1)",
-						'borderWidth'          => 1
+						'borderWidth'          => 2
 					);
 					break;
 
@@ -154,7 +154,7 @@ if ( ! class_exists( 'wp_ulike_stats' ) ) {
 						'backgroundColor'      => "rgba(239, 83, 80,0.8)",
 						'borderColor'          => "rgba(198, 40, 40,1)",
 						'pointBackgroundColor' => "rgba(255,255,255,1)",
-						'borderWidth'          => 1
+						'borderWidth'          => 2
 					);
 					break;
 
@@ -164,7 +164,7 @@ if ( ! class_exists( 'wp_ulike_stats' ) ) {
 						'backgroundColor'      => "rgba(102, 187, 106,0.8)",
 						'borderColor'          => "rgba(27, 94, 32,1)",
 						'pointBackgroundColor' => "rgba(255,255,255,1)",
-						'borderWidth'          => 1
+						'borderWidth'          => 2
 					);
 					break;
 			}
@@ -187,8 +187,7 @@ if ( ! class_exists( 'wp_ulike_stats' ) ) {
 					count(date_time) AS counts
 					FROM %s
 					WHERE TO_DAYS(NOW()) - TO_DAYS(date_time) <= 30
-					GROUP BY labels
-					ASC LIMIT %d",
+					GROUP BY labels ORDER BY labels ASC LIMIT %d",
 					$this->wpdb->prefix . $table,
 					30
 				);

@@ -3,7 +3,7 @@
  * About page template
  * 
  * @package    wp-ulike
- * @author     TechnoWich 2021
+ * @author     TechnoWich 2022
  * @link       https://wpulike.com
  */
 
@@ -65,7 +65,12 @@
 						<td><img class="wp-ulike-table-icon" src="<?php echo WP_ULIKE_ASSETS_URL; ?>/img/svg/checkmark.svg" alt="Checkmark" /></td>
 					</tr>
 					<tr>
-						<td>AJAX Based Login, Registration and Reset Password forms.</td>
+						<td>AJAX Based Login, Registration, Reset Password and edit account forms.</td>
+						<td><img class="wp-ulike-table-icon" src="<?php echo WP_ULIKE_ASSETS_URL; ?>/img/svg/cross-remove.svg" alt="Cross Remove" /></td>
+						<td><img class="wp-ulike-table-icon" src="<?php echo WP_ULIKE_ASSETS_URL; ?>/img/svg/checkmark.svg" alt="Checkmark" /></td>
+					</tr>
+					<tr>
+						<td>Easy Social Share Buttons for WordPress</td>
 						<td><img class="wp-ulike-table-icon" src="<?php echo WP_ULIKE_ASSETS_URL; ?>/img/svg/cross-remove.svg" alt="Cross Remove" /></td>
 						<td><img class="wp-ulike-table-icon" src="<?php echo WP_ULIKE_ASSETS_URL; ?>/img/svg/checkmark.svg" alt="Checkmark" /></td>
 					</tr>
@@ -76,6 +81,11 @@
 					</tr>
 					<tr>
   						<td>Advanced Settings Panel With Easy Backup and Flexible Customization Options</td>
+						<td><img class="wp-ulike-table-icon" src="<?php echo WP_ULIKE_ASSETS_URL; ?>/img/svg/cross-remove.svg" alt="Cross Remove" /></td>
+						<td><img class="wp-ulike-table-icon" src="<?php echo WP_ULIKE_ASSETS_URL; ?>/img/svg/checkmark.svg" alt="Checkmark" /></td>
+					</tr>
+					<tr>
+						<td>Simple Local Avatars With Revolutionary File Uploader</td>
 						<td><img class="wp-ulike-table-icon" src="<?php echo WP_ULIKE_ASSETS_URL; ?>/img/svg/cross-remove.svg" alt="Cross Remove" /></td>
 						<td><img class="wp-ulike-table-icon" src="<?php echo WP_ULIKE_ASSETS_URL; ?>/img/svg/checkmark.svg" alt="Checkmark" /></td>
 					</tr>

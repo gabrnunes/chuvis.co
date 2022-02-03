@@ -13,8 +13,6 @@
 /**
  * Processes the tax query to formulate a query restriction to the MySQL query.
  *
- * Tested.
- *
  * @uses relevanssi_process_tax_query_row()
  *
  * @param string $tax_query_relation The base tax query relation. Default 'and'.
@@ -22,9 +20,9 @@
  *
  * @return string The query restrictions for the MySQL query.
  */
-function relevanssi_process_tax_query( $tax_query_relation, $tax_query ) {
+function relevanssi_process_tax_query( string $tax_query_relation, array $tax_query ) : string {
 	$query_restrictions = '';
-	if ( ! isset( $tax_query_relation ) ) {
+	if ( empty( $tax_query_relation ) ) {
 		$tax_query_relation = 'and';
 	}
 	$tax_query_relation = relevanssi_strtolower( $tax_query_relation );
@@ -78,8 +76,6 @@ function relevanssi_process_tax_query( $tax_query_relation, $tax_query ) {
 /**
  * Processes one tax_query row.
  *
- * Tested.
- *
  * @global object $wpdb The WordPress database interface.
  *
  * @param array   $row                The tax_query row array.
@@ -96,7 +92,10 @@ function relevanssi_process_tax_query( $tax_query_relation, $tax_query ) {
  * $query_restrictions, then $term_tax_ids, $not_term_tax_ids, $and_term_tax_ids
  * and $exist_queries.
  */
-function relevanssi_process_tax_query_row( $row, $is_sub_row, $global_relation, $query_restrictions, $tax_query_relation, $term_tax_ids, $not_term_tax_ids, $and_term_tax_ids, $exist_queries ) {
+function relevanssi_process_tax_query_row( array $row, bool $is_sub_row,
+string $global_relation, string $query_restrictions, string $tax_query_relation,
+array $term_tax_ids, array $not_term_tax_ids, array $and_term_tax_ids,
+array $exist_queries ) : array {
 	global $wpdb;
 
 	$local_term_tax_ids     = array();
@@ -167,11 +166,15 @@ function relevanssi_process_tax_query_row( $row, $is_sub_row, $global_relation, 
 					)";
 				// Clean: $term_tax_id and $n are Relevanssi-generated.
 			} else {
-				$query_restrictions .= " AND relevanssi.doc $tq_operator (
-					SELECT DISTINCT(tr.object_id)
-						FROM $wpdb->term_relationships AS tr
-						WHERE tr.term_taxonomy_id IN ($term_tax_id))";
-				// Clean: all variables are Relevanssi-generated.
+				if ( 'or' === $global_relation ) {
+					$local_and_term_tax_ids[] = $term_tax_id;
+				} else {
+					$query_restrictions .= " AND relevanssi.doc $tq_operator (
+						SELECT DISTINCT(tr.object_id)
+							FROM $wpdb->term_relationships AS tr
+							WHERE tr.term_taxonomy_id IN ($term_tax_id))";
+					// Clean: all variables are Relevanssi-generated.
+				}
 			}
 		} else {
 			if ( 'IN' === $tq_operator ) {
@@ -220,14 +223,20 @@ function relevanssi_process_tax_query_row( $row, $is_sub_row, $global_relation, 
 		}
 	}
 
-	return array( $query_restrictions, $term_tax_ids, $not_term_tax_ids, $and_term_tax_ids, $exist_queries );
+	return array(
+		$query_restrictions,
+		$term_tax_ids,
+		$not_term_tax_ids,
+		$and_term_tax_ids,
+		$exist_queries,
+	);
 }
 
 /**
  * Generates query restrictions from the term taxonomy ids.
  *
- * Combines different term tax ID arrays into a set of query restrictions that can be
- * used in an OR query.
+ * Combines different term tax ID arrays into a set of query restrictions that
+ * can be used in an OR query.
  *
  * @global object $wpdb The WP database interface.
  *
@@ -238,7 +247,8 @@ function relevanssi_process_tax_query_row( $row, $is_sub_row, $global_relation, 
  *
  * @return string The MySQL query restrictions.
  */
-function relevanssi_process_term_tax_ids( $term_tax_ids, $not_term_tax_ids, $and_term_tax_ids, $exist_queries ) {
+function relevanssi_process_term_tax_ids( array $term_tax_ids, array $not_term_tax_ids,
+array $and_term_tax_ids, array $exist_queries ) : string {
 	global $wpdb;
 
 	$query_restriction_parts = array();
@@ -264,17 +274,36 @@ function relevanssi_process_term_tax_ids( $term_tax_ids, $not_term_tax_ids, $and
 		// Clean: all variables are Relevanssi-generated.
 	}
 	if ( count( $and_term_tax_ids ) > 0 ) {
-		$and_term_tax_ids           = implode( ',', $and_term_tax_ids );
-		$n                          = count( explode( ',', $and_term_tax_ids ) );
-		$query_restriction_parts[] .= " relevanssi.doc IN (
-			SELECT ID FROM $wpdb->posts WHERE 1=1
-			AND (
-				SELECT COUNT(1)
-				FROM $wpdb->term_relationships AS tr
-				WHERE tr.term_taxonomy_id IN ($and_term_tax_ids)
-				AND tr.object_id = $wpdb->posts.ID ) = $n
-			)";
-		// Clean: all variables are Relevanssi-generated.
+		$single_term_ids = array();
+		foreach ( $and_term_tax_ids as $term_ids ) {
+			$n = count( explode( ',', $term_ids ) );
+			if ( 1 === $n ) {
+				$single_term_ids[] = $term_ids;
+				continue;
+			}
+			$query_restriction_parts[] .= " relevanssi.doc IN (
+				SELECT ID FROM $wpdb->posts WHERE 1=1
+				AND (
+					SELECT COUNT(1)
+					FROM $wpdb->term_relationships AS tr
+					WHERE tr.term_taxonomy_id IN ($term_ids)
+					AND tr.object_id = $wpdb->posts.ID ) = $n
+				)";
+			// Clean: all variables are Relevanssi-generated.
+		}
+		if ( count( $single_term_ids ) > 0 ) {
+			$n                          = count( $single_term_ids );
+			$term_ids                   = implode( ',', $single_term_ids );
+			$query_restriction_parts[] .= " relevanssi.doc IN (
+				SELECT ID FROM $wpdb->posts WHERE 1=1
+				AND (
+					SELECT COUNT(1)
+					FROM $wpdb->term_relationships AS tr
+					WHERE tr.term_taxonomy_id IN ($term_ids)
+					AND tr.object_id = $wpdb->posts.ID ) = $n
+				)";
+			// Clean: all variables are Relevanssi-generated.
+		}
 	}
 
 	if ( $exist_queries ) {
@@ -299,17 +328,19 @@ function relevanssi_process_term_tax_ids( $term_tax_ids, $not_term_tax_ids, $and
 /**
  * Gets and sanitizes the taxonomy name and slug parameters.
  *
- * Checks parameters: if they're numeric, pass them for term_id filtering, otherwise
- * sanitize and create a comma-separated list.
+ * Checks parameters: if they're numeric, pass them for term_id filtering,
+ * otherwise sanitize and create a comma-separated list.
  *
- * @param string $terms_parameter The 'terms' field from the tax_query row.
- * @param string $taxonomy        The taxonomy name.
- * @param string $field_name      The field name ('slug', 'name').
+ * @param string|array $terms_parameter The 'terms' field from the tax_query
+ * row.
+ * @param string       $taxonomy        The taxonomy name.
+ * @param string       $field_name      The field name ('slug', 'name').
  *
- * @return array An array containing numeric terms and the list of sanitized term
- * names.
+ * @return array An array containing numeric terms and the list of sanitized
+ * term names.
  */
-function relevanssi_get_term_in( $terms_parameter, $taxonomy, $field_name ) {
+function relevanssi_get_term_in( $terms_parameter, string $taxonomy,
+string $field_name ) : array {
 	$numeric_terms = array();
 	$names         = array();
 
@@ -340,14 +371,14 @@ function relevanssi_get_term_in( $terms_parameter, $taxonomy, $field_name ) {
 /**
  * Gets the term_tax_id from a row with 'field' set to 'slug' or 'name'.
  *
- * If the slugs or names are all numeric values, will switch the 'field' parameter
- * to 'term_id'.
+ * If the slugs or names are all numeric values, will switch the 'field'
+ * parameter to 'term_id'.
  *
  * @param array $row The taxonomy query row.
  *
  * @return array An array of term taxonomy IDs.
  */
-function relevanssi_term_tax_id_from_row( $row ) {
+function relevanssi_term_tax_id_from_row( array $row ) : array {
 	global $wpdb;
 
 	$type = $row['field'];

@@ -1,7 +1,8 @@
-version: '3'
+version: "3"
 
 services:
   db:
+    platform: linux/x86_64
     image: mysql:latest
     container_name: db_server
     volumes:
@@ -10,8 +11,8 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password123 # any random string will do
-      MYSQL_DATABASE: escoladeescrita # the name of your mysql database
-      MYSQL_USER: root # the name of the database user
+      MYSQL_DATABASE: chuvisco # the name of your mysql database
+      MYSQL_USER: userchuvisco # the name of the database user
       MYSQL_PASSWORD: password123 # the password of the mysql user
   wordpress:
     depends_on:
@@ -23,9 +24,9 @@ services:
     restart: always
     environment:
       WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_USER: userchuvisco
       WORDPRESS_DB_PASSWORD: password123
-      WORDPRESS_DB_NAME: escoladeescrita
+      WORDPRESS_DB_NAME: chuvisco
     working_dir: /var/www/html
     volumes:
       - ./wp-content:/var/www/html/wp-content

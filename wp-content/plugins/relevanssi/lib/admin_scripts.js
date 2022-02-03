@@ -8,7 +8,12 @@ jQuery(document).ready(function ($) {
 
 	$("#removeallstopwords").click(function () {
 		var c = confirm(relevanssi.confirm_stopwords)
-		return c //you can just return c because it will be true or false
+		return c
+	})
+
+	$("#delete_query").click(function () {
+		var c = confirm(relevanssi.confirm_delete_query)
+		return c
 	})
 })
 
@@ -89,7 +94,7 @@ jQuery(document).ready(function ($) {
 		$("#build_index").attr("disabled", "disabled")
 		var relevanssi_note = $("#relevanssi-note")
 		relevanssi_note.show()
-		relevanssi_note.html(relevanssi.options_changed)
+		relevanssi_note.html('<p class="description important">' + relevanssi.options_changed + '</p>')
 	})
 
 	$("#relevanssi_default_orderby").change(function (e) {

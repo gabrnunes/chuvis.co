@@ -22,7 +22,7 @@ class wfUtils {
 	}
 	public static function makeTimeAgo($secs, $noSeconds = false) {
 		if($secs < 1){
-			return "a moment";
+			return __("a moment", 'wordfence');
 		}
 		
 		if (function_exists('date_diff')) {
@@ -57,25 +57,29 @@ class wfUtils {
 		}
 		
 		if ($years) {
-			return self::pluralize($years, 'year', $months, 'month');
+			return $years . ' ' . _n('year', 'years', $years, 'wordfence') .
+				(is_numeric($months) ? ' ' . $months . ' ' . _n('month', 'months', $months, 'wordfence') : '');
 		}
 		else if ($months) {
-			return self::pluralize($months, 'month', $days, 'day');
+			return $months . ' ' . _n('month', 'months', $months, 'wordfence') .
+				(is_numeric($days) ? ' ' . $days . ' ' . _n('day', 'days', $days, 'wordfence') : '');
 		}
 		else if ($days) {
-			return self::pluralize($days, 'day', $hours, 'hour');
+			return $days . ' ' . _n('day', 'days', $days, 'wordfence') .
+				(is_numeric($hours) ? ' ' . $hours . ' ' . _n('hour', 'hours', $hours, 'wordfence') : '');
 		}
 		else if ($hours) {
-			return self::pluralize($hours, 'hour', $minutes, 'min');
+			return $hours . ' ' . _n('hour', 'hours', $hours, 'wordfence') .
+				(is_numeric($minutes) ? ' ' . $minutes . ' ' . _n('minute', 'minutes', $minutes, 'wordfence') : '');
 		}
 		else if ($minutes) {
-			return self::pluralize($minutes, 'min');
+			return $minutes . ' ' . _n('minute', 'minutes', $minutes, 'wordfence');
 		}
 		else {
 			if($noSeconds){
-				return "less than a minute";
+				return __("less than a minute", 'wordfence');
 			} else {
-				return floor($secs) . " secs";
+				return sprintf(/* translators: Number of seconds. */ __("%d seconds", 'wordfence'), floor($secs));
 			}
 		}
 	}
@@ -88,47 +92,43 @@ class wfUtils {
 		$minutes = floor($secs / 60); $secs -= $minutes * 60;
 		
 		if ($months) {
-			$components[] = self::pluralize($months, 'month');
+			$components[] = $months . ' ' . _n('month', 'months', $months, 'wordfence');
 			if (!$createExact) {
 				$hours = $minutes = $secs = 0;
 			}
 		}
 		if ($days) {
-			$components[] = self::pluralize($days, 'day');
+			$components[] = $days . ' ' . _n('day', 'days', $days, 'wordfence');
 			if (!$createExact) {
 				$minutes = $secs = 0;
 			}
 		}
 		if ($hours) {
-			$components[] = self::pluralize($hours, 'hour');
+			$components[] = $hours . ' ' . _n('hour', 'hours', $hours, 'wordfence');
 			if (!$createExact) {
 				$secs = 0;
 			}
 		}
 		if ($minutes) {
-			$components[] = self::pluralize($minutes, 'minute');
+			$components[] = $minutes . ' ' . _n('minute', 'minutes', $minutes, 'wordfence');
 		}
 		if ($secs && $secs >= 1) {
-			$components[] = self::pluralize($secs, 'second');
+			$components[] = $secs . ' ' . _n('second', 'seconds', $secs, 'wordfence');
 		}
 		
 		if (empty($components)) {
-			$components[] = 'less than 1 second';
+			$components[] = __('less than 1 second', 'wordfence');
 		}
 		
 		return implode(' ', $components);
 	}
-	public static function pluralize($m1, $t1, $m2 = false, $t2 = false) {
-		if($m1 != 1) {
-			$t1 = $t1 . 's';
-		}
-		if($m2 != 1) {
-			$t2 = $t2 . 's';
-		}
-		if($m1 && $m2){
-			return "$m1 $t1 $m2 $t2";
+	public static function pluralize($m1, $m1Singular, $m1Plural, $m2 = false, $m2Singular = false, $m2Plural = false) {
+		$m1Text = _n($m1Singular, $m1Plural, $m1, 'wordfence');
+		if (is_numeric($m2)) {
+			$m2Text = _n($m2Singular, $m2Plural, $m2, 'wordfence');
+			return "$m1 $m1Text $m2 $m2Text";
 		} else {
-			return "$m1 $t1";
+			return "$m1 $m1Text";
 		}
 	}
 	public static function formatBytes($bytes, $precision = 2) {
@@ -1200,7 +1200,7 @@ class wfUtils {
 	public static function encrypt($str){
 		$key = wfConfig::get('encKey');
 		if(! $key){
-			wordfence::status(1, 'error', "Wordfence error: No encryption key found!");
+			wordfence::status(1, 'error', __("Wordfence error: No encryption key found!", 'wordfence'));
 			return false;
 		}
 		$db = new wfDB();
@@ -1209,7 +1209,7 @@ class wfUtils {
 	public static function decrypt($str){
 		$key = wfConfig::get('encKey');
 		if(! $key){
-			wordfence::status(1, 'error', "Wordfence error: No encryption key found!");
+			wordfence::status(1, 'error', __("Wordfence error: No encryption key found!", 'wordfence'));
 			return false;
 		}
 		$db = new wfDB();
@@ -1481,7 +1481,7 @@ class wfUtils {
 					}
 				}
 			} catch(Exception $e){
-				wordfence::status(2, 'error', "Call to Wordfence API to resolve IPs failed: " . $e->getMessage());
+				wordfence::status(2, 'error', sprintf(/* translators: Error message. */ __("Call to Wordfence API to resolve IPs failed: %s", 'wordfence'), $e->getMessage()));
 				return array();
 			}
 		}
@@ -2156,7 +2156,8 @@ class wfUtils {
 					's'      => $siteurl,
 					'h'		 => $homeurl,
 					't'		 => microtime(true),
-				), null, '&'),
+					'lang'   => get_site_option('WPLANG'),
+				), '', '&'),
 				array(
 					'body'    => json_encode($payload),
 					'headers' => array(
@@ -2851,11 +2852,7 @@ class wfUtils {
 			$base = time();
 		}
 		
-		$offset = wfConfig::get('timeoffset_ntp', false);
-		if ($offset === false) {
-			$offset = wfConfig::get('timeoffset_wf', false);
-			if ($offset === false) { $offset = 0; }
-		}
+		$offset = (int) wfConfig::get('timeoffset_wf', 0);
 		return $base + $offset;
 	}
 	
@@ -2866,11 +2863,7 @@ class wfUtils {
 	 * @return int
 	 */
 	public static function denormalizedTime($base) {
-		$offset = wfConfig::get('timeoffset_ntp', false);
-		if ($offset === false) {
-			$offset = wfConfig::get('timeoffset_wf', false);
-			if ($offset === false) { $offset = 0; }
-		}
+		$offset = (int) wfConfig::get('timeoffset_wf', 0);
 		return $base - $offset;
 	}
 	
@@ -3047,6 +3040,45 @@ class wfUtils {
 		}
 		return $payload;
 	}
+
+	/**
+	 * Split a path into its components
+	 * @param string $path
+	 */
+	public static function splitPath($path) {
+		return preg_split('/[\\/\\\\]/', $path, -1, PREG_SPLIT_NO_EMPTY);
+	}
+
+	/**
+	 * Convert an absolute path to a path relative to $to
+	 * @param string $absolute the absolute path to convert
+	 * @param string $to the absolute path from which to derive the relative path
+	 * @param bool $leadingSlash if true, prepend the resultant URL with a slash
+	 */
+	public static function relativePath($absolute, $to, $leadingSlash = false) {
+		$trailingSlash = in_array(substr($absolute, -1), array('/', '\\'));
+		$absoluteComponents = self::splitPath($absolute);
+		$toComponents = self::splitPath($to);
+		$relativeComponents = array();
+		do {
+			$currentAbsolute = array_shift($absoluteComponents);
+			$currentTo = array_shift($toComponents);
+		} while($currentAbsolute === $currentTo && $currentAbsolute !== null);
+		while ($currentTo !== null) {
+			array_push($relativeComponents, '..');
+			$currentTo = array_shift($toComponents);
+		}
+		while ($currentAbsolute !== null) {
+			array_push($relativeComponents, $currentAbsolute);
+			$currentAbsolute = array_shift($absoluteComponents);
+		}
+		return implode(array(
+			$leadingSlash ? '/' : '',
+			implode('/', $relativeComponents),
+			($trailingSlash && (count($relativeComponents) > 0 || !$leadingSlash)) ? '/' : ''
+		));
+	}
+
 }
 
 // GeoIP lib uses these as well

@@ -2,11 +2,11 @@
 Contributors: alimir
 Donate link: https://wpulike.com/?utm_source=wp-repo&utm_medium=link&utm_campaign=readme
 Author: TechnoWich
-Tags: like, marketing, elementor, user profile, statistics, favorite, rating, button, dislike, gamification, bookmark, member
+Tags: like, marketing, elementor, user profile, rating, favorite, statistics, button, dislike, gamification, bookmark, member
 Requires PHP: 5.6
 Requires at least: 5.0
-Tested up to: 5.6
-Stable tag: 4.4.5
+Tested up to: 5.8
+Stable tag: 4.5.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,6 +43,9 @@ Not happy with the default WordPress login and registration pages? In WP ULike P
 
 = Boost Your SEO by Using Our Schema Markup Generator [PRO] =
 Schema markup is a form of data structure and helps Search Engine to have a better understanding of content. The Process for adding these schemas to your webpage is quite messy and confusing. Because of that, WP ULike Pro adds a Metabox to your posts so you can easily generate your custom rich snippets.
+
+= Easy Social Share Buttons for WordPress [PRO] =
+WP ULike Share buttons enables your website users to share the content over Facebook, Twitter, Google, Linkedin, Whatsapp, Tumblr, Pinterest, Reddit and over 23 more social sharing services. This is the Simplest and Smoothest Social Sharing service with optimized and great looking vector icons.
 
 = Try WP ULike Pro - The Best Marketing Tool For WordPress =
 So let's talk [PROfessional](https://wpulike.com/pricing/?utm_source=wp-repo&utm_medium=link&utm_campaign=readme)! WP ULike Pro has support DisLike button alongside Like button, both of them are completely customizable in our redesigned settings menu with tones of features and more beautiful and stylish templates. the PRO version of the plugin is now compatible with Elementor Page builder and you can easily choose from +7 widgets by simply drag and drop them to your content. as you build your page and content with Elementor, you can add and customize Like and Dislike button in every part such as Posts, Comments, activities, etc.
@@ -130,12 +133,94 @@ Yes.
 =  Is WP ULike safe? =
 We are a professional and international team called TechnoWich that uses the latest coding and design methods in projects.
 
-Our WP ULike project has been able to attract more than 50,000 active users in the last few years and has a high score in the WordPress repository. All functions of this plugin are documented and you can follow its development process on Github.
+Our WP ULike project has been able to attract more than 60,000 active users in the last few years and has a high score in the WordPress repository. All functions of this plugin are documented and you can follow its development process on Github.
 
 =  Does WP ULike run on Apache, Nginx, LiteSpeed, etc? =
 Yes, WP ULike is compatible with Apache, Nginx, Microsoft IIS et LiteSpeed web servers.
 
 == Changelog ==
+
+= 4.5.9 =
+* Improved: Compatibility with WordPress 5.9 applied.
+* Updated: Options panel framework.
+* Fixed: Minor bug fixes.
+
+= 4.5.8 =
+* Fixed: Minor bug fixes.
+
+= 4.5.7.1 =
+* Fixed: Meta table issues.
+
+= 4.5.7 =
+* Added: Animated Clapping Template. [PRO]
+* Added: New option to limit the number of votes that can be submitted by a user. (only for no-limit logging method)
+* Added: An option to change the permalink structure of user profiles. [PRO]
+* Improved: Installed composer packages.
+* Improved: Guest client identifies method.
+* Improved: Database structures.
+* Fixed: Options panel framework issues with Bitnami.
+* Fixed: Minor bug fixes.
+
+= 4.5.6 =
+* Added: New option to set blacklist validation.
+* Improved: Client address detection methods.
+* Fixed: Minor bug fixes.
+
+= 4.5.5 =
+* Added: New option to set cookie expire time.
+* Added: Button alignment option in customizer panel.
+* Added: New option to enable counter value on admin comment columns with sorting capability.
+* Updated: Making admin banners smaller.
+* Updated: Options panel framework.
+* Fixed: Minor bug fixes.
+
+= 4.5.4 =
+* Improved: Compatibility with WordPress 5.8 applied.
+* Fixed: Minor bug fixes and performance improvements.
+
+= 4.5.3 =
+* Fixed: Reported JS counter issues.
+
+= 4.5.2 =
+* Fixed: JS conflict issue with buddypress activity stream.
+
+= 4.5.1 =
+* Updated: Display counter and likers list by DOM insertion to prevent post excerpt issues.
+* Updated: Add interval time support on counter shortcode.
+* Updated: Options panel framework.
+* Fixed: widget issues on "Last Posts Liked By User" functionality.
+* Fixed: Minor bug fixes and performance improvements.
+
+= 4.5.0 =
+* Added: Local avatar controller with revolutionary file uploader. [PRO]
+* Updated: Toast messages styles.
+* Updated: Add new hooks for developers.
+* Fixed: An issue with CTA catch message.
+* Fixed: Minor bug fixes and performance improvements.
+
+= 4.4.9 =
+* Updated: About page documents.
+* Fixed: BuddyPress notification issue.
+* Fixed: Issue with some deprecated function.
+* Fixed: Cached nonce issue inside CTA process.
+
+= 4.4.8 =
+* Added: New modern "pile + modal" template for likers box. [PRO]
+* Added: Auto display option for standard attachments. [PRO]
+* Added: New option to filter buddypress user notifications.
+* Fixed: An issue with top posts query.
+
+= 4.4.7 =
+* Improved: Some old functionalities.
+* Improved: Compatibility with WordPress 5.7 applied.
+* Fixed: Some major issues.
+
+= 4.4.6 =
+* Added: Social share buttons generator. (+ auto display functionality) [PRO]
+* Added: New customizer options for social share, profile, login & register forms. [PRO]
+* Added: Compatibility with WPML plugin. [PRO]
+* Updated: myCred functionalities.
+* Fixed: Some major issues.
 
 = 4.4.5 =
 * Added: New popover template for likers box.
@@ -771,6 +856,12 @@ Yes, WP ULike is compatible with Apache, Nginx, Microsoft IIS et LiteSpeed web s
 * The initial version
 
 == Upgrade Notice ==
+
+= 4.5.3 =
+Important: If page cache is enabled on your site, clear the cache immediately after updating.
+
+= 4.5.1 =
+Important: If page cache is enabled on your site, clear the cache immediately after updating.
 
 = 4.3.0 =
 In this update, we have made changes to the class structure that have made plugin development much easier. So we had to delete the $wp_ulike_class global variable. If you used this variable manually, replace it with the class wp_ulike_cta_process.

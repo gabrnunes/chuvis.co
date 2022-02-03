@@ -13,13 +13,13 @@ echo wfView::create('scanner/issue-base', array(
 		__('File Type', 'wordfence') => '{{if data.cType}}${WFAD.ucfirst(data.cType)}{{else data.wpconfig}}' . __('WordPress Configuration File', 'wordfence') . '{{else}}' . __('Not a core, theme, or plugin file from wordpress.org', 'wordfence') . '.{{/if}}',
 		__('Bad URL', 'wordfence') => array('(typeof data.badURL !== \'undefined\') && data.badURL', '${data.badURL}'),
 		null,
-		__('Details', 'wordfence') => '{{html longMsg}}<br><br>{{if data.wpconfig}}<strong>' . __('This is your main configuration file and cannot be deleted. It must be cleaned manually.', 'wordfence') . '</strong>{{/if}}',
+		__('Details', 'wordfence') => '{{html longMsg}}<br><br>{{if data.wpconfig}}<strong>' . esc_html__('This is your main configuration file and cannot be deleted. It must be cleaned manually.', 'wordfence') . '</strong>{{/if}}',
 	),
 	'detailControls' => array(
-		'{{if data.fileExists}}<a target="_blank" class="wf-btn wf-btn-default wf-btn-callout-subtle" rel="noopener noreferrer" href="${WFAD.makeViewFileLink(data.file)}">' . __('View File', 'wordfence') . '</a>{{/if}}',
-		'{{if data.canDiff}}<a target="_blank" class="wf-btn wf-btn-default wf-btn-callout-subtle" rel="noopener noreferrer" href="${WFAD.makeDiffLink(data)}">' . __('View Differences', 'wordfence') . '</a>{{/if}}',
-		'{{if data.canDelete}}<a href="#" class="wf-btn wf-btn-default wf-btn-callout-subtle wf-issue-control-delete-file">' . __('Delete File', 'wordfence') . '</a>{{/if}}',
-		'<a href="#" class="wf-btn wf-btn-default wf-btn-callout-subtle wf-issue-control-mark-fixed">' . __('Mark as Fixed', 'wordfence') . '</a>',
+		'{{if data.fileExists}}<a target="_blank" class="wf-btn wf-btn-default wf-btn-callout-subtle" rel="noopener noreferrer" href="${WFAD.makeViewFileLink(data.file)}">' . __('View File', 'wordfence') . '<span class="screen-reader-text"> (' . esc_html__('opens in new tab', 'wordfence') . ')</span></a>{{/if}}',
+		'{{if data.canDiff}}<a target="_blank" class="wf-btn wf-btn-default wf-btn-callout-subtle" rel="noopener noreferrer" href="${WFAD.makeDiffLink(data)}">' . __('View Differences', 'wordfence') . '<span class="screen-reader-text"> (' . esc_html__('opens in new tab', 'wordfence') . ')</span></a>{{/if}}',
+		'{{if data.canDelete}}<a href="#" class="wf-btn wf-btn-default wf-btn-callout-subtle wf-issue-control-delete-file" role="button">' . __('Delete File', 'wordfence') . '</a>{{/if}}',
+		'<a href="#" class="wf-btn wf-btn-default wf-btn-callout-subtle wf-issue-control-mark-fixed" role="button">' . __('Mark as Fixed', 'wordfence') . '</a>',
 	),
 	'textOutput' => (isset($textOutput) ? $textOutput : null),
 	'textOutputDetailPairs' => array(

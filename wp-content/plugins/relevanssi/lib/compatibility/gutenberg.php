@@ -37,7 +37,7 @@ function relevanssi_register_gutenberg_actions() {
 	);
 }
 
-add_filter( 'relevanssi_post_content', 'relevanssi_gutenberg_block_rendering', 10 );
+add_filter( 'relevanssi_post_content', 'relevanssi_gutenberg_block_rendering', 10, 2 );
 
 /**
  * Renders Gutenberg blocks.
@@ -49,11 +49,24 @@ add_filter( 'relevanssi_post_content', 'relevanssi_gutenberg_block_rendering', 1
  *
  * @see do_blocks()
  *
- * @param string $content The post content.
+ * @param string $content     The post content.
+ * @param object $post_object The post object.
  *
  * @return string The post content with the rendered content added.
  */
-function relevanssi_gutenberg_block_rendering( $content ) {
+function relevanssi_gutenberg_block_rendering( $content, $post_object ) {
+	/**
+	 * Filters whether the blocks are rendered or not.
+	 *
+	 * If this filter returns false, the blocks in this post are not rendered,
+	 * and the post content is returned as such.
+	 *
+	 * @param boolean If true, render the blocks. Default true.
+	 * @param object  The post object.
+	 */
+	if ( ! apply_filters( 'relevanssi_render_blocks', true, $post_object ) ) {
+		return $content;
+	}
 	$blocks = parse_blocks( $content );
 	$output = '';
 
@@ -79,7 +92,20 @@ function relevanssi_gutenberg_block_rendering( $content ) {
 			! isset( $block['attrs']['className'] )
 			|| false === strstr( $block['attrs']['className'], 'relevanssi_noindex' )
 			) {
-			$output .= render_block( $block );
+			/**
+			 * Filters the Gutenberg block after it is rendered.
+			 *
+			 * The value is the output from render_block( $block ). Feel free to
+			 * modify it as you wish.
+			 *
+			 * @see render_block
+			 *
+			 * @param string The rendered block content.
+			 * @param array  $block The Gutenberg block being rendered.
+			 *
+			 * @return string The filtered block content.
+			 */
+			$output .= apply_filters( 'relevanssi_rendered_block', render_block( $block ), $block );
 		}
 	}
 

@@ -1,0 +1,215 @@
+/*
+Theme Name: Chuvisco
+Theme URI: https://chuvis.co
+Description: Tema do Chuvisco
+Author: Gabriel Nunes
+Version: 1.0
+*/
+
+/**
+ * Responsive WordPress Core Theme Styles
+ * http://jeffsebring.com/responsive-wordpress-images/
+--------------------------------------------------- */
+
+.sticky,
+.bypostauthor,
+.gallery-caption {
+  display: normal;
+}
+
+.alignnone {
+  margin: 1em 1em 1em 0;
+}
+
+.aligncenter,
+div.aligncenter {
+  display: block;
+  margin: 0.5em auto;
+}
+
+.alignright {
+  float: right;
+  margin: 0 0 1em 1em;
+}
+
+.alignleft {
+  float: left;
+  margin: 0 1em 1em 0;
+}
+
+.aligncenter {
+  display: block;
+  margin: 1em auto;
+}
+
+img,
+img[class*="align"],
+img[class*="wp-image-"] {
+  max-width: 100%;
+  height: auto;
+}
+
+img.wp-smiley {
+  border: none;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding: 0;
+}
+
+img.alignright {
+  margin-left: 1em 0 1em 1em;
+}
+
+img.alignleft {
+  margin: 1em 1em 1em 0;
+}
+
+img.aligncenter {
+  display: block;
+  margin: 1em auto;
+}
+
+img#wpstats {
+  display: block;
+  margin: 0 auto;
+}
+
+img[class*="align"],
+img[class*="wp-image-"],
+.gallery .gallery-icon img {
+  border: none;
+}
+
+.wp-caption {
+  margin-bottom: 1em;
+  margin-left: 0;
+  max-width: 96%;
+  text-align: center;
+}
+
+.wp-caption img {
+  display: block;
+  margin: 0 auto;
+}
+
+.wp-caption-text {
+  position: relative;
+  font-size: 0.8em;
+}
+
+.gallery {
+  margin: 0 auto;
+}
+
+.gallery .gallery-item {
+  margin: 0;
+  float: left;
+  text-align: center;
+  width: 33%;
+}
+
+.gallery a img {
+  border: none;
+}
+
+.gallery-columns-4 .gallery-item {
+  width: 25%;
+}
+
+.gallery-columns-4 .gallery-item img {
+  width: 100%;
+  height: auto;
+}
+
+.comments ol {
+  padding-left: 0;
+}
+
+.comments ol li {
+  margin: 0;
+}
+
+.comment-author {
+  padding: 0;
+  text-decoration: none;
+}
+
+.container-home h3 {
+  color: #3db5c2;
+  font-weight: bold;
+}
+
+.container-home p {
+  font-size: 1.2rem;
+}
+
+blockquote {
+  font-size: 18px;
+  font-style: italic;
+  margin: 0.25em 3rem;
+  padding: 0.25em 60px;
+  line-height: 1.45;
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+blockquote:before {
+  display: block;
+  content: "\201C";
+  font-size: 80px;
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  color: #7a7a7a;
+}
+
+blockquote cite {
+  color: #999999;
+  font-size: 14px;
+  display: block;
+  margin-top: 5px;
+}
+
+blockquote cite:before {
+  content: "\2014 \2009";
+}
+
+@media only screen and (max-width: 991px) {
+  embed,
+  object {
+    max-width: 100%;
+  }
+
+  .wp-block-columns {
+    display: block !important;
+  }
+  .has-2-columns .wp-block-column,
+  .has-3-columns .wp-block-column,
+  .has-4-columns .wp-block-column,
+  .has-5-columns .wp-block-column,
+  .has-6-columns .wp-block-column {
+    width: 100% !important;
+  }
+}
+
+@media only screen and (max-width: 650px) {
+  .gallery-columns-3 .gallery-item {
+    width: 33.33%;
+  }
+
+  .gallery-columns-3 .gallery-item img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .gallery-columns-2 .gallery-item {
+    width: 50%;
+  }
+
+  .gallery-columns-2 .gallery-item img {
+    width: 100%;
+    height: auto;
+  }
+}

@@ -57,7 +57,7 @@ foreach ($diagnostic->getResults() as $title => $tests):
 endforeach;
 ?>
 
-## <?php _e('IP Detection', 'wordfence') ?>: <?php _e('Methods of detecting a visitor\'s IP address.', 'wordfence') ?> ##
+## <?php esc_html_e('IP Detection', 'wordfence') ?>: <?php esc_html_e('Methods of detecting a visitor\'s IP address.', 'wordfence') ?> ##
 
 <?php
 $howGet = wfConfig::get('howGetIPs', false);
@@ -114,7 +114,7 @@ echo wfHelperString::plainTextTable($table) . "\n\n";
 
 ?>
 
-## <?php _e('WordPress Settings', 'wordfence') ?>: <?php _e('WordPress version and internal settings/constants.', 'wordfence') ?> ##
+## <?php esc_html_e('WordPress Settings', 'wordfence') ?>: <?php esc_html_e('WordPress version and internal settings/constants.', 'wordfence') ?> ##
 
 <?php
 require(ABSPATH . 'wp-includes/version.php');
@@ -217,7 +217,7 @@ echo wfHelperString::plainTextTable($table) . "\n\n";
 
 ?>
 
-## <?php _e('WordPress Plugins', 'wordfence') ?>: <?php _e('Status of installed plugins.', 'wordfence') ?> ##
+## <?php esc_html_e('WordPress Plugins', 'wordfence') ?>: <?php esc_html_e('Status of installed plugins.', 'wordfence') ?> ##
 
 <?php
 
@@ -255,7 +255,7 @@ echo wfHelperString::plainTextTable($table) . "\n\n";
 
 ?>
 
-## <?php _e('Must-Use WordPress Plugins', 'wordfence') ?>: <?php _e('WordPress "mu-plugins" that are always active, including those provided by hosts.', 'wordfence') ?> ##
+## <?php esc_html_e('Must-Use WordPress Plugins', 'wordfence') ?>: <?php esc_html_e('WordPress "mu-plugins" that are always active, including those provided by hosts.', 'wordfence') ?> ##
 
 <?php
 
@@ -293,25 +293,25 @@ echo wfHelperString::plainTextTable($table) . "\n\n";
 
 ?>
 
-## <?php _e('Drop-In WordPress Plugins', 'wordfence') ?>: <?php _e('WordPress "drop-in" plugins that are active.', 'wordfence') ?> ##
+## <?php esc_html_e('Drop-In WordPress Plugins', 'wordfence') ?>: <?php esc_html_e('WordPress "drop-in" plugins that are active.', 'wordfence') ?> ##
 
 <?php
 
 //Taken from plugin.php and modified to always show multisite drop-ins
 $dropins = array(
-	'advanced-cache.php'      => array(__('Advanced caching plugin'), 'WP_CACHE'), // WP_CACHE
-	'db.php'                  => array(__('Custom database class'), true), // auto on load
-	'db-error.php'            => array(__('Custom database error message'), true), // auto on error
-	'install.php'             => array(__('Custom installation script'), true), // auto on installation
-	'maintenance.php'         => array(__('Custom maintenance message'), true), // auto on maintenance
-	'object-cache.php'        => array(__('External object cache'), true), // auto on load
-	'php-error.php'           => array(__('Custom PHP error message'), true), // auto on error
-	'fatal-error-handler.php' => array(__('Custom PHP fatal error handler'), true), // auto on error
+	'advanced-cache.php'      => array(__('Advanced caching plugin', 'wordfence'), 'WP_CACHE'), // WP_CACHE
+	'db.php'                  => array(__('Custom database class', 'wordfence'), true), // auto on load
+	'db-error.php'            => array(__('Custom database error message', 'wordfence'), true), // auto on error
+	'install.php'             => array(__('Custom installation script', 'wordfence'), true), // auto on installation
+	'maintenance.php'         => array(__('Custom maintenance message', 'wordfence'), true), // auto on maintenance
+	'object-cache.php'        => array(__('External object cache', 'wordfence'), true), // auto on load
+	'php-error.php'           => array(__('Custom PHP error message', 'wordfence'), true), // auto on error
+	'fatal-error-handler.php' => array(__('Custom PHP fatal error handler', 'wordfence'), true), // auto on error
 );
-$dropins['sunrise.php'] = array(__('Executed before Multisite is loaded'), is_multisite() && 'SUNRISE'); // SUNRISE
-$dropins['blog-deleted.php'] = array(__('Custom site deleted message'), is_multisite()); // auto on deleted blog
-$dropins['blog-inactive.php'] = array(__('Custom site inactive message'), is_multisite()); // auto on inactive blog
-$dropins['blog-suspended.php'] = array(__('Custom site suspended message'), is_multisite()); // auto on archived or spammed blog
+$dropins['sunrise.php'] = array(__('Executed before Multisite is loaded', 'wordfence'), is_multisite() && 'SUNRISE'); // SUNRISE
+$dropins['blog-deleted.php'] = array(__('Custom site deleted message', 'wordfence'), is_multisite()); // auto on deleted blog
+$dropins['blog-inactive.php'] = array(__('Custom site inactive message', 'wordfence'), is_multisite()); // auto on inactive blog
+$dropins['blog-suspended.php'] = array(__('Custom site suspended message', 'wordfence'), is_multisite()); // auto on archived or spammed blog
 
 $table = array(
 	array(__('Name', 'wordfence'), __('Status', 'wordfence')),
@@ -329,7 +329,7 @@ echo wfHelperString::plainTextTable($table) . "\n\n";
 
 ?>
 
-## <?php _e('Themes', 'wordfence') ?>: <?php _e('Status of installed themes.', 'wordfence') ?> ##
+## <?php esc_html_e('Themes', 'wordfence') ?>: <?php esc_html_e('Status of installed themes.', 'wordfence') ?> ##
 
 <?php
 
@@ -372,7 +372,7 @@ echo wfHelperString::plainTextTable($table) . "\n\n";
 
 ?>
 
-## <?php _e('Cron Jobs', 'wordfence') ?>: <?php _e('List of WordPress cron jobs scheduled by WordPress, plugins, or themes.', 'wordfence') ?> ##
+## <?php esc_html_e('Cron Jobs', 'wordfence') ?>: <?php esc_html_e('List of WordPress cron jobs scheduled by WordPress, plugins, or themes.', 'wordfence') ?> ##
 
 <?php
 $cron = _get_cron_array();
@@ -399,7 +399,7 @@ echo wfHelperString::plainTextTable($table) . "\n\n";
 
 ?>
 
-## <?php _e('Database Tables', 'wordfence') ?>: <?php _e('Database table names, sizes, timestamps, and other metadata.', 'wordfence') ?> ##
+## <?php esc_html_e('Database Tables', 'wordfence') ?>: <?php esc_html_e('Database table names, sizes, timestamps, and other metadata.', 'wordfence') ?> ##
 
 <?php
 global $wpdb;
@@ -452,7 +452,7 @@ if ($q) {
 		if ($hasAll) {
 			_e('All Tables Exist', 'wordfence');
 		} else {
-			printf(__('Tables missing (prefix %s, %s): %s', 'wordfence'), wfDB::networkPrefix(), wfSchema::usingLowercase() ? __('lowercase', 'wordfence') : __('regular case', 'wordfence'), implode(', ', $missingTables));
+			printf(/* translators: 1. WordPress table prefix. 2. Wordfence tables. */ __('Tables missing (prefix %1$s, %2$s): %s', 'wordfence'), wfDB::networkPrefix(), wfSchema::usingLowercase() ? __('lowercase', 'wordfence') : __('regular case', 'wordfence'), implode(', ', $missingTables));
 		}
 		echo "\n";
 	}
@@ -497,7 +497,7 @@ echo wfHelperString::plainTextTable($table) . "\n\n";
 
 ?>
 
-## <?php _e('Log Files', 'wordfence') ?>: <?php _e('PHP error logs generated by your site, if enabled by your host.', 'wordfence') ?> ##
+## <?php esc_html_e('Log Files', 'wordfence') ?>: <?php esc_html_e('PHP error logs generated by your site, if enabled by your host.', 'wordfence') ?> ##
 
 <?php
 
@@ -550,7 +550,7 @@ echo wfHelperString::plainTextTable($table) . "\n\n";
 
 ?>
 
-## <?php _e('Scan Issues', 'wordfence') ?> ##
+## <?php esc_html_e('Scan Issues', 'wordfence') ?> ##
 
 <?php
 
@@ -621,4 +621,3 @@ if (preg_match_all('#(?:<h2>(.*?)</h2>\s*)?<table[^>]*>(.*?)</table>#is', $phpin
 
 
 ?>
-

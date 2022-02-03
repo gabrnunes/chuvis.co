@@ -58,6 +58,15 @@ class Controller_CAPTCHA {
 	public function threshold() {
 		return Controller_Settings::shared()->get_float(Controller_Settings::OPTION_RECAPTCHA_THRESHOLD, 0.5);
 	}
+
+	/**
+	 * Determine whether or not test mode for reCAPTCHA is enabled
+	 *
+	 * @return bool
+	 */
+	public function test_mode() {
+		return Controller_Settings::shared()->get_bool(\WordfenceLS\Controller_Settings::OPTION_CAPTCHA_TEST_MODE);
+	}
 	
 	/**
 	 * Queries the reCAPTCHA endpoint with the given token, verifies the action matches, and returns the corresponding 
@@ -111,11 +120,37 @@ class Controller_CAPTCHA {
 	 * @return bool
 	 */
 	public function is_human($score) {
-		if (Controller_Settings::shared()->get_bool(\WordfenceLS\Controller_Settings::OPTION_CAPTCHA_TEST_MODE)) {
+		if ($this->test_mode()) {
 			return true;
 		}
 		
 		$threshold = $this->threshold();
 		return ($score >= $threshold || abs($score - $threshold) < 0.0001);
+	}
+
+	/**
+	 * Check if the current request is an XML RPC request
+	 * @return bool
+	 */
+	private static function is_xml_rpc() {
+		return defined('XMLRPC_REQUEST') && XMLRPC_REQUEST;
+	}
+
+	/**
+	 * Check if captcha is required for the current request
+	 * @return bool
+	 */
+	public function is_captcha_required() {
+		$required = $this->enabled() && !self::is_xml_rpc();
+		return apply_filters('wordfence_ls_require_captcha', $required);
+	}
+
+	/**
+	 * Get the captcha token provided with the current request
+	 * @param string $key if specified, override the default token parameter
+	 * @return string|null the captcha token, if present, null otherwise
+	 */
+	public function get_token($key = 'wfls-captcha-token') {
+		return (isset($_POST[$key]) && is_string($_POST[$key]) && !empty($_POST[$key]) ? $_POST[$key] : null);
 	}
 }

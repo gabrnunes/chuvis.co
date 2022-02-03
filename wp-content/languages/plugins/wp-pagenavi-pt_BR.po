@@ -1,0 +1,196 @@
+# Translation of Plugins - WP-PageNavi - Stable (latest release) in Portuguese (Brazil)
+# This file is distributed under the same license as the Plugins - WP-PageNavi - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2020-10-03 14:04:47+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: GlotPress/3.0.0-alpha.2\n"
+"Language: pt_BR\n"
+"Project-Id-Version: Plugins - WP-PageNavi - Stable (latest release)\n"
+
+#: core.php:130 core.php:149 core.php:161
+msgid "Page %s"
+msgstr "Página %s"
+
+#: admin.php:9
+msgid "PageNavi Settings"
+msgstr "Configurações do PageNavi"
+
+#: admin.php:10
+msgid "PageNavi"
+msgstr "PageNavi"
+
+#: admin.php:33
+msgid "Text For Number Of Pages"
+msgstr "Texto para Número de Páginas"
+
+#: admin.php:38
+msgid "The current page number."
+msgstr "O número da página atual."
+
+#: admin.php:39 admin.php:63 admin.php:71
+msgid "The total number of pages."
+msgstr "O número total de páginas."
+
+#: admin.php:43
+msgid "Text For Current Page"
+msgstr "Texto para Página Atual"
+
+#: admin.php:47 admin.php:55
+msgid "The page number."
+msgstr "O numéro da página."
+
+#: admin.php:51
+msgid "Text For Page"
+msgstr "Texto para Página"
+
+#: admin.php:59
+msgid "Text For First Page"
+msgstr "Texto para Primeira Página"
+
+#: admin.php:67
+msgid "Text For Last Page"
+msgstr "Texto para Última Página"
+
+#: admin.php:75
+msgid "Text For Previous Page"
+msgstr "Texto para Página Anterior"
+
+#: admin.php:81
+msgid "Text For Next Page"
+msgstr "Texto para Próxima Página"
+
+#: admin.php:87
+msgid "Text For Previous ..."
+msgstr "Texto para Anterior ..."
+
+#: admin.php:93
+msgid "Text For Next ..."
+msgstr "Texto para Próximo ..."
+
+#: admin.php:100
+msgid "Page Navigation Text"
+msgstr "Texto da Paginação"
+
+#: admin.php:101
+msgid "Leaving a field blank will hide that part of the navigation."
+msgstr "Deixar um campo em branco vai esconder esta parte da navegação."
+
+#: admin.php:107
+msgid "Use pagenavi-css.css"
+msgstr "Usar pagenavi-css.css"
+
+#: admin.php:114
+msgid "Page Navigation Style"
+msgstr "Estilos da Paginação"
+
+#: admin.php:117
+msgid "Normal"
+msgstr "Normal"
+
+#: admin.php:117
+msgid "Drop-down List"
+msgstr "Lista Drop-down"
+
+#: admin.php:122
+msgid "Always Show Page Navigation"
+msgstr "Sempre mostrar Paginação"
+
+#: admin.php:126
+msgid "Show navigation even if there's only one page."
+msgstr "Mostrar navegação mesmo se tiver apenas uma página."
+
+#: admin.php:130
+msgid "Number Of Pages To Show"
+msgstr "Quantidade de Páginas a mostrar"
+
+#: admin.php:137
+msgid "Number Of Larger Page Numbers To Show"
+msgstr "Quantidade de Páginas Distantes a mostrar"
+
+#: admin.php:142
+msgid "Larger page numbers are in addition to the normal page numbers. They are useful when there are many pages of posts."
+msgstr "Numeração de Páginas Distantes são uma adição a numeração normal. Elas são úteis quando há várias páginas de posts."
+
+#: admin.php:143
+msgid "For example, WP-PageNavi will display: Pages 1, 2, 3, 4, 5, 10, 20, 30, 40, 50."
+msgstr "Por exemplo, a Paginação vai mostrar: Páginas 1, 2, 3, 4, 5, 10, 20, 30, 40, 50."
+
+#: admin.php:144
+msgid "Enter 0 to disable."
+msgstr "Digite 0 para desabilitar."
+
+#: admin.php:148
+msgid "Show Larger Page Numbers In Multiples Of"
+msgstr "Mostrar Páginas Distantes em Múltiplos de"
+
+#: admin.php:153
+msgid "For example, if mutiple is 5, it will show: 5, 10, 15, 20, 25"
+msgstr "Por exemplo, se múltiplo de 5, vai mostrar: 5, 10, 15, 20, 25"
+
+#: admin.php:158
+msgid "Page Navigation Options"
+msgstr "Opção da Paginação"
+
+#: scb/AdminPage.php:257
+msgid "Settings <strong>saved</strong>."
+msgstr "Configurações <strong>salvas</strong>"
+
+#: scb/AdminPage.php:514
+msgid "Settings"
+msgstr "Configurações"
+
+#: wp-pagenavi.php:20
+msgid "Page %CURRENT_PAGE% of %TOTAL_PAGES%"
+msgstr "Página %CURRENT_PAGE% de %TOTAL_PAGES%"
+
+#: wp-pagenavi.php:23
+msgid "&laquo; First"
+msgstr "&laquo; Primeira"
+
+#: wp-pagenavi.php:24
+msgid "Last &raquo;"
+msgstr "Última &raquo;"
+
+#: wp-pagenavi.php:25
+msgid "&laquo;"
+msgstr "&laquo;"
+
+#: wp-pagenavi.php:26
+msgid "&raquo;"
+msgstr "&raquo;"
+
+#: wp-pagenavi.php:27 wp-pagenavi.php:28
+msgid "..."
+msgstr "..."
+
+#. Plugin Name of the plugin
+msgid "WP-PageNavi"
+msgstr "WP-PageNavi"
+
+#. Description of the plugin
+msgid "Adds a more advanced paging navigation to your WordPress blog"
+msgstr "Adicione uma paginação mais avançada ao seu blog Wordpress"
+
+#: admin.php:110 admin.php:125
+msgid "Yes"
+msgstr "Sim"
+
+#: admin.php:110 admin.php:125
+msgid "No"
+msgstr "Não"
+
+#. Author of the plugin
+msgid "Lester 'GaMerZ' Chan"
+msgstr "Lester 'GaMerZ' Chan"
+
+#. Plugin URI of the plugin
+msgid "https://lesterchan.net/portfolio/programming/php/"
+msgstr "https://lesterchan.net/portfolio/programming/php/"
+
+#. Author URI of the plugin
+msgid "https://lesterchan.net"
+msgstr "https://lesterchan.net"

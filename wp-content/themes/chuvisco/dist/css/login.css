@@ -1,0 +1,41 @@
+body.login {
+  background-color: #2a2b34;
+}
+
+.login h1 {
+  display: none;
+}
+.login form {
+  background-color: #2a2b34;
+  border: 1px solid #505160;
+  color: #ffffff;
+}
+.login #nav a,
+.login #backtoblog a {
+  color: #77788c;
+}
+.login #nav a:hover,
+.login #backtoblog a:hover {
+  color: #a7a9be;
+}
+
+.language-switcher {
+  display: none;
+}
+
+.wp-core-ui .button-primary {
+  background-color: #77788c;
+  border: 0;
+}
+.wp-core-ui .button-primary:hover {
+  background-color: #a7a9be;
+}
+.wp-core-ui .button-secondary {
+  color: #a7a9be;
+  border: 0;
+}
+.wp-core-ui .button-secondary:hover {
+  color: #77788c;
+}
+
+/*# sourceMappingURL=login.css.map */

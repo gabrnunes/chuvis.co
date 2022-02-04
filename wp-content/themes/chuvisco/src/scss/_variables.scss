@@ -1,60 +1,7 @@
-$primary: #a5513b;
-$secondary: #ffe9c1;
+$body: #2a2b34;
+$primary: #77788c;
+$secondary: #a7a9be;
+$tertiary: #505160;
+$white: #ffffff;
 
-$beige:          $secondary;
-$beige-dark:   #d1a077;
-$beige-darker: #7b4142;
-
-$purple-light: #552130;
-$purple:       #40143a;
-$purple-dark:  #2c182d;
-$purple-darker:#10151d;
-
-$orange-light:  #887a75;
-$orange:        $primary;
-
-$blue-light:    #005875;
-$blue:          #001e4b;
-$blue-dark:     #10151d;
-
-$body-color:    $blue-dark;
-
-$font-family-sans-serif: 'helveticaregular', sans-serif;
-
-$container-max-widths: (
-  sm: 540px,
-  md: 720px,
-  lg: 960px,
-  xl: 1200px 
-);
-
-$input-padding-y: 1rem;
-$input-padding-x: 1.2rem;
-$input-border-radius:0;
-
-$btn-border-radius:           0;
-$btn-border-radius-lg:        0;
-$btn-border-radius-sm:        0;
-
-$btn-line-height:             1;
- 
-// media queries
-$mobile: "only screen and (max-width : 767px)";
-$tablet: "only screen and (min-width : 768px) and (max-width : 991px)";
 $desktop: "only screen and (min-width : 992px)";
-$large-desktop: "only screen and (min-width : 1240px)";
-$small-desktop: "only screen and (min-width:992px) and (max-width:1310px)";
-
-// combos 
-$mobile-and-tablet: "only screen and (max-width:991px)";
-$tablet-and-above: "only screen and (min-width:768px)";
-
-/*
-
-EXEMPLO
-
-@media #{$mobile} {
-
-} 
-
-*/

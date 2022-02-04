@@ -1,0 +1,50 @@
+@import "variables";
+
+body.login {
+  background-color: $body;
+}
+
+.login {
+  h1 {
+    display: none;
+  }
+
+  form {
+    background-color: $body;
+    border: 1px solid $tertiary;
+    color: $white;
+  }
+
+  #nav a,
+  #backtoblog a {
+    color: $primary;
+
+    &:hover {
+      color: $secondary;
+    }
+  }
+}
+
+.language-switcher {
+  display: none;
+}
+
+.wp-core-ui {
+  .button-primary {
+    background-color: $primary;
+    border: 0;
+
+    &:hover {
+      background-color: $secondary;
+    }
+  }
+
+  .button-secondary {
+    color: $secondary;
+    border: 0;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+}

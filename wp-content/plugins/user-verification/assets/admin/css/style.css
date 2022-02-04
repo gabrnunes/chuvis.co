@@ -1,0 +1,58 @@
+/*
+Admin css
+*/
+
+
+.uv-pending-question-count {
+	background-color:#FE8163 !important;
+}
+
+.column-uv-status { text-align:center !important; }
+
+.uv_queued, 
+.uv_publish, 
+.uv_solved, 
+.uv_hold {
+    color: #fff;
+    width: 130px;
+    text-align: center;
+    padding: 5px 0;
+	margin: 10px auto;
+    border-radius: 3px;
+}
+
+.uv_queued 	{ background-color: #f39c12; }
+.uv_publish 	{ background-color: #1488C4; }
+.uv_solved 	{ background-color: #27ae60; }
+.uv_hold 	{ background-color: #f1c40f; }
+
+.section_title {
+	margin:3px 0;
+}
+
+
+.row-actions .uv_approve{
+	color: #138E77;
+	cursor: pointer;
+}
+
+.row-actions .uv_remove_approval{
+	color: #DC4840;
+	cursor: pointer;
+}
+
+.uv_status.status-0{
+	color: #DC4840;
+	cursor: pointer;
+}
+.uv_status.status-1{
+	color: #138E77;
+	cursor: pointer;
+}
+
+
+
+.row-actions .uv_resend_verification{
+	color: #138E77;
+	cursor: pointer;
+}

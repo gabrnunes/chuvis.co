@@ -1,14 +1,29 @@
 <?php
-remove_filter( 'acf_the_content', 'wpautop' );
-
-add_theme_support( 'post-thumbnails' );
-
-//Remove WPAUTOP from ACF TinyMCE Editor
-function field_withoutp($field) {
-    remove_filter('acf_the_content', 'wpautop' );
-    the_field($field);
-    add_filter('acf_the_content', 'wpautop' );
+function set_post_likes($postID) {
+    $count_key = 'post_like_count';
+    $count = get_post_meta($postID, $count_key, true);
+    if($count==''){
+        $count = 0;
+        delete_post_meta($postID, $count_key);
+        add_post_meta($postID, $count_key, '0');
+    } else{
+        $count++;
+        update_post_meta($postID, $count_key, $count);
+    }
 }
+
+function update_post_likes()
+{
+   if($_POST){
+        return;
+   } 
+
+   exit();
+}
+
+// creating Ajax call for WordPress  
+add_action('wp_ajax_nopriv_update_post_likes', 'update_post_likes');
+add_action('wp_ajax_update_post_likes', 'update_post_likes');
 
 /**
  * Disable the emoji's
@@ -38,17 +53,34 @@ function disable_emojis_tinymce( $plugins ) {
 	}
 }
 
-function wpb_set_post_views($postID) {
-    $count_key = 'wpb_post_views_count';
-    $count = get_post_meta($postID, $count_key, true);
-    if($count==''){
-        $count = 0;
-        delete_post_meta($postID, $count_key);
-        add_post_meta($postID, $count_key, '0');
-    }else{
-        $count++;
-        update_post_meta($postID, $count_key, $count);
-    }
+$required_capability = 'edit_others_posts';
+$redirect_to = '';
+function no_admin_init() {      
+    // We need the config vars inside the function
+    global $required_capability, $redirect_to;      
+    // Is this the admin interface?
+    if (
+        // Look for the presence of /wp-admin/ in the url
+        stripos($_SERVER['REQUEST_URI'],'/wp-admin/') !== false
+        &&
+        // Allow calls to async-upload.php
+        stripos($_SERVER['REQUEST_URI'],'async-upload.php') == false
+        &&
+        // Allow calls to admin-ajax.php
+        stripos($_SERVER['REQUEST_URI'],'admin-ajax.php') == false
+    ) {         
+        // Does the current user fail the required capability level?
+        if (!current_user_can($required_capability)) {              
+            if ($redirect_to == '') { $redirect_to = get_option('home'); }              
+            // Send a temporary redirect
+            wp_redirect($redirect_to,302);              
+        }           
+    }       
 }
-//To keep the count accurate, lets get rid of prefetching
-remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
+// Add the action with maximum priority
+add_action('init','no_admin_init',0);
+
+function my_login_stylesheet() {
+    wp_enqueue_style( 'custom-login', get_stylesheet_directory_uri() . '/dist/css/login.css' );
+}
+add_action( 'login_enqueue_scripts', 'my_login_stylesheet' );

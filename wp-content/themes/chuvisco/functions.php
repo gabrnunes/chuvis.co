@@ -1,33 +1,62 @@
 <?php
-function set_post_likes($postID) {
+/*
+ini_set('display_errors',1);
+error_reporting(E_ALL|E_STRICT);
+ini_set('error_log','script_errors.log');
+ini_set('log_errors','On');*/
+
+function increase_post_like($postID) {
+    $users_vote_key = 'post_users_vote';
+    $users_vote_array = get_post_meta($postID, $users_vote_key, true);
+
+    if($users_vote_array && array_search(get_current_user_id(), $users_vote_array) !== false) return false;
+
+    if (!$users_vote_array) {
+        $users_vote_array = array(get_current_user_id());
+        delete_post_meta($postID, $users_vote_key);
+        add_post_meta($postID, $users_vote_key, $users_vote_array);
+    } else {
+        $users_vote_array[] = get_current_user_id();
+        update_post_meta($postID, $users_vote_key, $users_vote_array);
+    }
+
     $count_key = 'post_like_count';
     $count = get_post_meta($postID, $count_key, true);
+
     if($count==''){
-        $count = 0;
+        $count = 1;
         delete_post_meta($postID, $count_key);
-        add_post_meta($postID, $count_key, '0');
+        add_post_meta($postID, $count_key, '1');
     } else{
         $count++;
         update_post_meta($postID, $count_key, $count);
     }
+
+    return $count;
 }
 
 function update_post_likes()
 {
-   if($_POST){
+    if(!is_user_logged_in())
         return;
-   } 
 
-   exit();
+    if(!$_POST)
+        return;
+
+    $count = increase_post_like($_POST['post_id']);
+
+    if ($count) {
+        echo json_encode(array('success' => true, 'count' => $count));
+    } else {
+        echo json_encode(array('success' => false));
+    }
+
+    wp_die();
 }
 
-// creating Ajax call for WordPress  
 add_action('wp_ajax_nopriv_update_post_likes', 'update_post_likes');
 add_action('wp_ajax_update_post_likes', 'update_post_likes');
 
-/**
- * Disable the emoji's
- */
 function disable_emojis() {
 	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );

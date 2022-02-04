@@ -1,7 +1,7 @@
 
 <footer class="footer">
     <div class="container">
-        <?php get_search_form(); ?>
+        <?php if(!is_page()) get_search_form(); ?>
 
         <nav>
             <ul>

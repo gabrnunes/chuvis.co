@@ -203,6 +203,8 @@ h6 {
 }
 
 .vote {
+  border: 0;
+  background: transparent;
   width: 2rem;
   display: flex;
   flex-direction: column;
@@ -216,12 +218,22 @@ h6 {
   fill: #77788c;
   transition: 0.2s all ease-in-out;
 }
-.vote:hover {
+.vote.can-vote {
+  cursor: pointer;
+}
+.vote.can-vote:hover {
   text-decoration: none;
   color: #a7a9be;
 }
-.vote:hover svg path {
+.vote.can-vote:hover svg path {
   fill: #a7a9be;
+  transition: 0.2s all ease-in-out;
+}
+.vote.already-voted {
+  color: #ffffff;
+}
+.vote.already-voted svg path {
+  fill: #ffffff;
   transition: 0.2s all ease-in-out;
 }
 
@@ -266,6 +278,37 @@ h6 {
   margin-bottom: 1rem;
 }
 
+.form-control {
+  margin-bottom: 0.5rem;
+}
+.form-control label {
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+.form-control input[type="text"],
+.form-control input[type="url"] {
+  width: 50%;
+}
+.form-control .help-block {
+  color: #77788c;
+  font-size: 0.75rem;
+}
+
+.bookmarklet {
+  border: 1px solid #505160;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  max-width: 70%;
+}
+.bookmarklet a {
+  background-color: #a7a9be;
+  color: #2a2b34;
+  display: inline-block;
+  padding: 0.2em 0.5rem;
+  text-decoration: none;
+  margin-top: 0.5rem;
+}
+
 .footer {
   padding: 1rem 0;
   border-top: 1px solid #505160;
@@ -281,7 +324,6 @@ h6 {
   list-style: none;
   display: flex;
   gap: 1rem;
-  margin: 0 2rem;
 }
 .footer a {
   color: #ffffff;

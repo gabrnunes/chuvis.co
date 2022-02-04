@@ -23,9 +23,12 @@
             <a href="<?php echo $externalUrl; ?>" title="<?php the_title(); ?>">
                 <?php the_title(); ?>
             </a>
-            <?php foreach($postTags as $t) : ?>
+            <?php if($postTags) : 
+                foreach($postTags as $t) : ?>
                 <span class="tag"><?php echo $t->name; ?></span>
-            <?php endforeach; ?>
+            <?php 
+                endforeach; 
+            endif; ?>
             <span class="domain"><?php echo $onlyDomain; ?></span>
         </div>
         <div class="data">

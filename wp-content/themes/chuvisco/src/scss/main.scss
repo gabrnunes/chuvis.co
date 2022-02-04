@@ -114,6 +114,8 @@
 }
 
 .vote {
+  border: 0;
+  background: transparent;
   width: 2rem;
   display: flex;
   flex-direction: column;
@@ -130,13 +132,28 @@
     }
   }
 
-  &:hover {
-    text-decoration: none;
-    color: $secondary;
+  &.can-vote {
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: none;
+      color: $secondary;
+
+      svg {
+        path {
+          fill: $secondary;
+          transition: 0.2s all ease-in-out;
+        }
+      }
+    }
+  }
+
+  &.already-voted {
+    color: $white;
 
     svg {
       path {
-        fill: $secondary;
+        fill: $white;
         transition: 0.2s all ease-in-out;
       }
     }
@@ -194,6 +211,41 @@
   margin-bottom: 1rem;
 }
 
+.form-control {
+  margin-bottom: 0.5rem;
+
+  label {
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+  }
+
+  input[type="text"],
+  input[type="url"] {
+    width: 50%;
+  }
+
+  .help-block {
+    color: $primary;
+    font-size: 0.75rem;
+  }
+}
+
+.bookmarklet {
+  border: 1px solid $tertiary;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  max-width: 70%;
+
+  a {
+    background-color: $secondary;
+    color: $body;
+    display: inline-block;
+    padding: 0.2em 0.5rem;
+    text-decoration: none;
+    margin-top: 0.5rem;
+  }
+}
+
 .footer {
   padding: 1rem 0;
   border-top: 1px solid $tertiary;
@@ -209,7 +261,6 @@
       list-style: none;
       display: flex;
       gap: 1rem;
-      margin: 0 2rem;
     }
   }
 

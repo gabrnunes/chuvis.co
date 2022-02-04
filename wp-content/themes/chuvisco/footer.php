@@ -8,6 +8,7 @@
                 <li><a href="<?php echo home_url( '/regras' ); ?>">regras</a></li>
                 <li><a href="<?php echo home_url( '/duvidas' ); ?>">dúvidas</a></li>
                 <li><a href="<?php echo home_url( '/contato' ); ?>">contato</a></li>
+                <li>hospedado pela <a href="https://webhaus.com.br/" target="_blank" rel="noopener noreferrer">Webhaus</a></li>
             </ul>
         </nav>
     </div>

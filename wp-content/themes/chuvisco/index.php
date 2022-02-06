@@ -1,4 +1,3 @@
-
 <?php  get_header();  ?>
 
 <div class="container">
@@ -12,9 +11,14 @@
             while (have_posts()) : the_post();
                 get_template_part('post', null, array('id' => get_the_id()));
             endwhile; 
+
+            $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+
+            previous_posts_link( '&laquo; mais recentes' );
+            if ($paged > 1) echo "&nbsp;&nbsp;";
+            next_posts_link( 'mais antigos &raquo;', $the_query->max_num_pages );
     ?>
     
-    <?php wp_pagenavi(); ?>
 
     <?php else: ?>
         

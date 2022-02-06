@@ -6,6 +6,8 @@ ini_set('error_log','script_errors.log');
 ini_set('log_errors','On');*/
 
 function increase_post_like($postID) {
+    if (!is_user_logged_in()) return false;
+
     $users_vote_key = 'post_users_vote';
     $users_vote_array = get_post_meta($postID, $users_vote_key, true);
 

@@ -7,6 +7,13 @@ if (!is_user_logged_in()) {
 
 if ( $_POST && isset($_POST['title']) ) {
 
+    $alreadyPosted = get_page_by_title($_POST['title'], OBJECT, 'post');
+
+    if($alreadyPosted->ID && $alreadyPosted->post_author == get_current_user_id()) {
+        wp_redirect(home_url('/p/'.$alreadyPosted->ID));
+        exit;
+    }
+
     $post = array(
         'post_title'    => $_POST['title'],
         'tags_input'    => $_POST['english'] ? "em-ingles" : "",

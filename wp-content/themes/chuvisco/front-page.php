@@ -1,7 +1,10 @@
 <?php 
 
-global $wpdb;    
-$result = $wpdb->get_results("
+global $wpdb;
+
+$date = date("Y/m/d", strtotime("-5 day"));
+
+$query = "
 SELECT
        p.ID, ((TIME_TO_SEC(TIMEDIFF(NOW(), p.post_date)) / 60) / m.meta_value) AS minutes
 FROM
@@ -11,10 +14,13 @@ FROM
      WHERE
            p.post_type = 'post'
            AND ( m.meta_key = 'post_like_count')
+           AND p.post_date >= '$date' 
 ORDER BY
          minutes ASC
 LIMIT 30
-");
+";
+
+$result = $wpdb->get_results($query);
 
 ?>
 

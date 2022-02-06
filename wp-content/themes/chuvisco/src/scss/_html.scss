@@ -32,6 +32,15 @@ a {
   }
 }
 
+p {
+  margin-bottom: 1rem;
+
+  &.last-updated {
+    font-size: 0.75rem;
+    color: $primary;
+  }
+}
+
 .container {
   max-width: 900px;
   margin: 0 auto;

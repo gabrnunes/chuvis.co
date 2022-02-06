@@ -29,6 +29,14 @@ a:hover {
   transition: 0.2s all ease-in-out;
 }
 
+p {
+  margin-bottom: 1rem;
+}
+p.last-updated {
+  font-size: 0.75rem;
+  color: #77788c;
+}
+
 .container {
   max-width: 900px;
   margin: 0 auto;

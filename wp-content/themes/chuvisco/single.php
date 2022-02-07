@@ -8,6 +8,9 @@ $post_ID = get_the_ID();
 
 <div class="container">
     <?php get_template_part('post', null, array('id' => $post_ID)); ?>
+
+    <?php the_content(); ?>
+
     <?php comments_template(); ?> 
 </div>
 

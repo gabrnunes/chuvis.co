@@ -26,7 +26,7 @@ if ( $_POST && isset($_POST['title']) ) {
     $post_id = wp_insert_post($post);
 
     if ( $post_id ) {
-        wp_redirect(home_url('/p/'.$post_id));
+        wp_redirect(home_url('/novos/'));
         exit;
     }
 }

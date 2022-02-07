@@ -9,6 +9,7 @@
     $postTags = get_the_tags();
 
     $externalUrl = get_post_meta($postID, 'external_url', true);
+    if (!$externalUrl) $externalUrl = get_permalink();
     $onlyDomain = parse_url($externalUrl, PHP_URL_HOST);
 
     date_default_timezone_set('America/Sao_Paulo');

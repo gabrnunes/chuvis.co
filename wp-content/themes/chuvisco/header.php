@@ -4,7 +4,26 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- Primary Meta Tags -->
   <title><?php wp_title('&#8212; ', true, 'right'); ?>Chuvisco</title>
+  <meta name="title" content="<?php wp_title('&#8212; ', true, 'right'); ?>Chuvisco">
+  <meta name="description" content="Participe da nossa comunidade e tenha acesso a links de artigos, ferramentas e tudo que entusiastas da cultura criativa e maker precisam.">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://metatags.io/">
+  <meta property="og:title" content="<?php wp_title('&#8212; ', true, 'right'); ?>Chuvisco">
+  <meta property="og:description" content="Participe da nossa comunidade e tenha acesso a links de artigos, ferramentas e tudo que entusiastas da cultura criativa e maker precisam.">
+  <meta property="og:image" content="<?php bloginfo('template_directory'); ?>/dist/images/card.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://metatags.io/">
+  <meta property="twitter:title" content="<?php wp_title('&#8212; ', true, 'right'); ?>Chuvisco">
+  <meta property="twitter:description" content="Participe da nossa comunidade e tenha acesso a links de artigos, ferramentas e tudo que entusiastas da cultura criativa e maker precisam.">
+  <meta property="twitter:image" content="<?php bloginfo('template_directory'); ?>/dist/images/card.png">
+
   <link rel="shortcut icon" type="image/png" href="<?php bloginfo('template_directory'); ?>/dist/images/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">

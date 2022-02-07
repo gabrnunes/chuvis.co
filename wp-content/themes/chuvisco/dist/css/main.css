@@ -125,8 +125,15 @@ h6 {
 .header .container,
 .header nav {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   flex-grow: 1;
+}
+@media only screen and (min-width: 992px) {
+  .header .container,
+  .header nav {
+    flex-direction: row;
+    align-items: center;
+  }
 }
 .header ul {
   padding: 0;
@@ -135,8 +142,10 @@ h6 {
   gap: 1rem;
   margin: 0 2rem;
 }
-.header ul:last-child {
-  margin-left: auto;
+@media only screen and (min-width: 992px) {
+  .header ul:last-child {
+    margin-left: auto;
+  }
 }
 .header a {
   color: #ffffff;
@@ -178,14 +187,25 @@ h6 {
 }
 .post .title {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+}
+@media only screen and (min-width: 992px) {
+  .post .title {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
 .post .title a {
   color: #ffffff;
 }
 .post .title a:hover {
   text-decoration: underline;
+}
+.post .title .post-data {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .post .tag {
   font-size: 0.75rem;
@@ -295,7 +315,13 @@ h6 {
 }
 .form-control input[type="text"],
 .form-control input[type="url"] {
-  width: 50%;
+  width: 100%;
+}
+@media only screen and (min-width: 992px) {
+  .form-control input[type="text"],
+  .form-control input[type="url"] {
+    width: 50%;
+  }
 }
 .form-control .help-block {
   color: #77788c;
@@ -307,6 +333,12 @@ h6 {
   padding: 1.5rem;
   margin-top: 2rem;
   max-width: 70%;
+  display: none;
+}
+@media only screen and (min-width: 992px) {
+  .bookmarklet {
+    display: block;
+  }
 }
 .bookmarklet a {
   background-color: #a7a9be;
@@ -324,14 +356,28 @@ h6 {
 }
 .footer .container {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+}
+@media only screen and (min-width: 992px) {
+  .footer .container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 .footer .container ul {
   padding: 0;
   list-style: none;
   display: flex;
   gap: 1rem;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+@media only screen and (min-width: 992px) {
+  .footer .container ul {
+    flex-direction: row;
+    margin-top: 0;
+  }
 }
 .footer a {
   color: #ffffff;

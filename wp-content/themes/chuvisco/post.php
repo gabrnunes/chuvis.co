@@ -23,13 +23,15 @@
             <a href="<?php echo $externalUrl; ?>" title="<?php the_title(); ?>">
                 <?php the_title(); ?>
             </a>
-            <?php if($postTags) : 
-                foreach($postTags as $t) : ?>
-                <span class="tag"><?php echo $t->name; ?></span>
-            <?php 
-                endforeach; 
-            endif; ?>
-            <span class="domain"><?php echo $onlyDomain; ?></span>
+            <div class="post-data">
+                <?php if($postTags) : 
+                    foreach($postTags as $t) : ?>
+                    <span class="tag"><?php echo $t->name; ?></span>
+                <?php 
+                    endforeach; 
+                endif; ?>
+                <span class="domain"><?php echo $onlyDomain; ?></span>
+            </div>
         </div>
         <div class="data">
             enviado por <?php echo get_the_author_meta('display_name', $post->post_author); ?> há <a href="<?php the_permalink(); ?>"><?php echo $humanDate; ?> atrás</a> | <a href="<?php the_permalink(); ?>"><?php comments_number( 'nenhum comentário', '1 comentário', '% comentários' ); ?></a>

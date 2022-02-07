@@ -7,13 +7,19 @@
   border-bottom: 1px solid $tertiary;
   margin-bottom: 2rem;
 
+  .container {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .container,
   nav {
     display: flex;
-    flex-direction: column;
     flex-grow: 1;
 
     @media #{$desktop} {
+      gap: 0;
       flex-direction: row;
       align-items: center;
     }
@@ -24,9 +30,14 @@
     list-style: none;
     display: flex;
     gap: 1rem;
-    margin: 0 2rem;
+
+    &:last-child {
+      margin-left: 1rem;
+    }
 
     @media #{$desktop} {
+      margin: 0 2rem;
+
       &:last-child {
         margin-left: auto;
       }
@@ -132,6 +143,7 @@
 }
 
 .vote {
+  flex: 0 0 2rem;
   border: 0;
   background: transparent;
   width: 2rem;

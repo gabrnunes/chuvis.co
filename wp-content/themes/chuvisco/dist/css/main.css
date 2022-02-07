@@ -122,15 +122,20 @@ h6 {
   border-bottom: 1px solid #505160;
   margin-bottom: 2rem;
 }
+.header .container {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
 .header .container,
 .header nav {
   display: flex;
-  flex-direction: column;
   flex-grow: 1;
 }
 @media only screen and (min-width: 992px) {
   .header .container,
   .header nav {
+    gap: 0;
     flex-direction: row;
     align-items: center;
   }
@@ -140,9 +145,14 @@ h6 {
   list-style: none;
   display: flex;
   gap: 1rem;
-  margin: 0 2rem;
+}
+.header ul:last-child {
+  margin-left: 1rem;
 }
 @media only screen and (min-width: 992px) {
+  .header ul {
+    margin: 0 2rem;
+  }
   .header ul:last-child {
     margin-left: auto;
   }
@@ -231,6 +241,7 @@ h6 {
 }
 
 .vote {
+  flex: 0 0 2rem;
   border: 0;
   background: transparent;
   width: 2rem;

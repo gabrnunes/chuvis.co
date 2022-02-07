@@ -12,14 +12,14 @@
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://metatags.io/">
+  <meta property="og:url" content="https://chuvis.co/">
   <meta property="og:title" content="<?php wp_title('&#8212; ', true, 'right'); ?>Chuvisco">
   <meta property="og:description" content="Participe da nossa comunidade e tenha acesso a links de artigos, ferramentas e tudo que entusiastas da cultura criativa e maker precisam.">
   <meta property="og:image" content="<?php bloginfo('template_directory'); ?>/dist/images/card.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://metatags.io/">
+  <meta property="twitter:url" content="https://chuvis.co/">
   <meta property="twitter:title" content="<?php wp_title('&#8212; ', true, 'right'); ?>Chuvisco">
   <meta property="twitter:description" content="Participe da nossa comunidade e tenha acesso a links de artigos, ferramentas e tudo que entusiastas da cultura criativa e maker precisam.">
   <meta property="twitter:image" content="<?php bloginfo('template_directory'); ?>/dist/images/card.png">
@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="<?php bloginfo('template_directory'); ?>/dist/css/main.css">
+  <link rel="stylesheet" type="text/css" href="<?php bloginfo('template_directory'); ?>/dist/css/main.css?1.0">
   <link rel="stylesheet" href="<?php bloginfo('stylesheet_url'); ?>" type="text/css" media="screen" />
 </head>
 

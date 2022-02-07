@@ -1,3 +1,5 @@
+![card](https://user-images.githubusercontent.com/9409763/152864168-f56e9ecb-bce5-44de-9901-cdadcdac4170.png)
+
 # Chuvisco
 
 O site https://chuvis.co foi criado usando o Wordpress. Este é o repositório que contém o tema do site. Por ser considerado um projeto open source, você pode contribuir com melhorias no tema como preferir.

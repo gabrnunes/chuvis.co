@@ -30,9 +30,10 @@ if ($query->have_posts()) :
 
         $points_comments = get_comments_number() * 2;
         $points_votes = get_post_meta(get_the_id(), 'post_like_count', true);
+        $total_points = $points_comments + $points_votes;
 
-        if ($points_votes != '')  {
-            $total_points = ($points_comments + $points_votes) - ($time_elapsed / 10);
+        if ($total_points > 0)  {
+            $total_points = $total_points - ($time_elapsed / 10);
 
             $posts_array[] = array(
                 'id' => get_the_id(),

@@ -10,6 +10,8 @@
   <meta name="title" content="<?php wp_title('&#8212; ', true, 'right'); ?>Chuvisco">
   <meta name="description" content="Participe da nossa comunidade e tenha acesso a links de artigos, ferramentas e tudo que entusiastas da cultura criativa e maker precisam.">
 
+  <link rel="alternate" type="application/rss+xml" title="RSS Feed do Chuvisco" href="<?php bloginfo('rss2_url'); ?>" />
+
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://chuvis.co/">

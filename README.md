@@ -20,9 +20,11 @@ Acesse a pasta do repositório e rode:
 docker-compose up
 ```
 
-Dentro do projeto acesse a pasta do tema e rode o `grunt`:
+Dentro do projeto acesse a pasta do tema e rode o `npm install`:
 
 ```bash
 cd wp-content/themes/chuvisco
-grunt watch
+npm install
 ```
+
+Depois, quando for precisar alterar algo em arquivos SASS é só rodar `grunt watch` na pasta do tema.

@@ -311,6 +311,7 @@
       @media #{$desktop} {
         flex-direction: row;
         margin-top: 0;
+        align-items: center;
       }
     }
   }
@@ -321,6 +322,16 @@
 
     &:hover {
       color: $primary;
+    }
+  }
+
+  svg {
+    path {
+      fill: $white;
+
+      &:hover {
+        fill: $primary;
+      }
     }
   }
 }

@@ -31,7 +31,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="<?php bloginfo('template_directory'); ?>/dist/css/main.css?1.0">
+  <link rel="stylesheet" type="text/css" href="<?php bloginfo('template_directory'); ?>/dist/css/main.css?1.2">
   <link rel="stylesheet" href="<?php bloginfo('stylesheet_url'); ?>" type="text/css" media="screen" />
 </head>
 

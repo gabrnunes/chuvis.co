@@ -388,6 +388,7 @@ h6 {
   .footer .container ul {
     flex-direction: row;
     margin-top: 0;
+    align-items: center;
   }
 }
 .footer a {
@@ -396,6 +397,12 @@ h6 {
 }
 .footer a:hover {
   color: #77788c;
+}
+.footer svg path {
+  fill: #ffffff;
+}
+.footer svg path:hover {
+  fill: #77788c;
 }
 
 /*# sourceMappingURL=main.css.map */

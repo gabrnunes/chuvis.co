@@ -5,6 +5,8 @@ error_reporting(E_ALL|E_STRICT);
 ini_set('error_log','script_errors.log');
 ini_set('log_errors','On');*/
 
+show_admin_bar(false);
+
 function increase_post_like($postID) {
     if (!is_user_logged_in()) return false;
 

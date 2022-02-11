@@ -15,6 +15,7 @@
     </div>
 </footer>
 
+<?php wp_footer(); ?>
 
 <script src="<?php bloginfo('template_directory'); ?>/dist/js/main.min.js?v=1.0"></script>
 <script data-goatcounter="https://chuvisco.goatcounter.com/count"

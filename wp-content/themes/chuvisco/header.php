@@ -33,6 +33,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="<?php bloginfo('template_directory'); ?>/dist/css/main.css?1.2">
   <link rel="stylesheet" href="<?php bloginfo('stylesheet_url'); ?>" type="text/css" media="screen" />
+
+  <?php wp_head(); ?> 
+
+  <?php
+if ( is_singular() && comments_open() && get_option('thread_comments') )
+  wp_enqueue_script( 'comment-reply' );
+?>
+
 </head>
 
 <body <?php body_class(); ?>>

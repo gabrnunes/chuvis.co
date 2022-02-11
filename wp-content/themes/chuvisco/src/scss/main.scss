@@ -90,17 +90,9 @@
   }
 
   .title {
-    display: flex;
-    flex-direction: column;
-
-    @media #{$desktop} {
-      flex-direction: row;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
     a {
       color: $white;
+      margin-right: 0.5rem;
 
       &:hover {
         text-decoration: underline;
@@ -108,7 +100,7 @@
     }
 
     .post-data {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
     }

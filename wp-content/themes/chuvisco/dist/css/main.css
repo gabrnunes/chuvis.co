@@ -195,25 +195,15 @@ h6 {
 .post a {
   text-decoration: none;
 }
-.post .title {
-  display: flex;
-  flex-direction: column;
-}
-@media only screen and (min-width: 992px) {
-  .post .title {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-  }
-}
 .post .title a {
   color: #ffffff;
+  margin-right: 0.5rem;
 }
 .post .title a:hover {
   text-decoration: underline;
 }
 .post .title .post-data {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 }

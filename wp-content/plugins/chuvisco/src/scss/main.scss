@@ -1,19 +1,40 @@
 $desktop: "only screen and (min-width : 992px)";
 
+:root {
+  --chuvisco-primary-color: #232323;
+  --chuvisco-secondary-color: #000000;
+  --chuvisco-tertiary-color: #939393;
+  --chuvisco-background-color: #e6e6e6;
+  --chuvisco-background-seconday-color: #cecece;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --chuvisco-primary-color: #dddddd;
+    --chuvisco-secondary-color: #ffffff;
+    --chuvisco-tertiary-color: #5f5f5f;
+    --chuvisco-background-color: #212121;
+    --chuvisco-background-seconday-color: #404040;
+  }
+}
+
+.chuvisco_post-template-default {
+  .post-navigation,
+  .widget-area {
+    display: none;
+  }
+}
+
 .chuvisco-post {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 
-  &-title {
-    a {
-      margin-right: 8px;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
+  @media #{$desktop} {
+    padding-bottom: 0;
+    border-bottom: 0;
   }
 
   &-info {
@@ -30,11 +51,13 @@ $desktop: "only screen and (min-width : 992px)";
   }
 
   &-domain {
-    font-size: 21px;
+    font-size: 0.85rem;
+    color: var(--chuvisco-tertiary-color);
   }
 
   &-date {
-    font-size: 21px;
+    font-size: 0.85rem;
+    font-family: monospace;
 
     a {
       &:hover {
@@ -44,23 +67,44 @@ $desktop: "only screen and (min-width : 992px)";
   }
 }
 
-.chuvisco-vote {
-  flex: 0 0 32px;
-  border: 0;
-  //background: transparent;
-  width: 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 21px;
-  text-align: center;
+.chuvisco-ranking {
+  counter-increment: css-counter 0;
 
-  svg {
-    path {
-      fill: #000;
-      transition: 0.2s all ease-in-out;
+  .chuvisco-post {
+    counter-increment: css-counter 1;
+
+    &:before {
+      content: counter(css-counter) ". ";
+      font-size: 1.2rem;
+      margin-right: 0.5rem;
     }
+  }
+}
+
+.chuvisco-vote {
+  border: 0;
+  width: 16px;
+  height: 32px;
+  position: relative;
+  cursor: default;
+  text-indent: -9999px;
+  overflow: hidden;
+  margin-right: 0.5rem;
+  background: transparent;
+
+  &:after {
+    bottom: 8px;
+    left: 0;
+    border: solid transparent;
+    content: "";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: rgba(0, 0, 0, 0);
+    border-bottom-color: var(--chuvisco-secondary-color);
+    border-width: 8px;
+    transition: 0.2s all ease-in-out;
   }
 
   &-can-vote {
@@ -69,21 +113,20 @@ $desktop: "only screen and (min-width : 992px)";
     &:hover {
       text-decoration: none;
 
-      svg {
-        path {
-          fill: #000;
-          transition: 0.2s all ease-in-out;
-        }
+      &:after {
+        border-bottom-color: var(--chuvisco-primary-color);
+        transition: 0.2s all ease-in-out;
       }
     }
   }
 
   &-already-voted {
-    svg {
-      path {
-        fill: #000;
-        transition: 0.2s all ease-in-out;
-      }
+    cursor: default;
+    opacity: 0.5;
+
+    &:after {
+      border-bottom-color: var(--chuvisco-tertiary-color);
+      transition: 0.2s all ease-in-out;
     }
   }
 }

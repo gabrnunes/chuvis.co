@@ -34,11 +34,13 @@ function upVote(url, postId, object) {
 
       var jsonData = JSON.parse(data);
       if (jsonData.success) {
-        var textToUpdate = object.querySelector("span");
+        var textToUpdate = document.querySelector(
+          "[data-votes-post-id='" + postId + "']"
+        );
         textToUpdate.innerHTML = jsonData.count;
 
-        object.classList.add("already-voted");
-        object.classList.remove("can-vote");
+        object.classList.add("chuvisco-vote-already-voted");
+        object.classList.remove("chuvisco-vote-can-vote");
       }
     }
   };

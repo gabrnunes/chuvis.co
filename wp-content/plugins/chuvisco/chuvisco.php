@@ -32,9 +32,11 @@ function chuvisco_setup_post_type() {
         'public' => true,
         'show_ui' => true,
         'hierarchical' => true,
-        'has_archive' => true,
+        'has_archive' => false,
         'supports' => array('title', 'custom-fields', 'author', 'comments', 'editor'),
         'capability_type' => 'post',
+        'exclude_from_search' => true,
+        'rewrite' => array('slug' => 'chuvisco'),
         )
     ); 
 } 
@@ -47,11 +49,6 @@ function chuvisco_sort_by_points($a, $b) {
 }
 
 function chuvisco_get_vote_html($post_id) {
-    $count_key = 'post_like_count';
-    $count = get_post_meta($post_id, $count_key, true);
-
-    if (!$count) $count = 0;
-
     $users_vote_key = 'post_users_vote';
     $users_vote_array = get_post_meta($post_id, $users_vote_key, true);
     $already_voted = false;
@@ -61,9 +58,8 @@ function chuvisco_get_vote_html($post_id) {
     if(is_user_logged_in() && !$already_voted) $additional_class = 'chuvisco-vote-can-vote';
     if($already_voted) $additional_class = 'chuvisco-vote-already-voted';
 
-    $html = '<button class="chuvisco-vote ' . $additional_class . '" data-url="' . admin_url('admin-ajax.php') . '" data-post-id="' . $post_id . '">';
-    $html .= '  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 0c-4.87 7.197-8 11.699-8 16.075 0 4.378 3.579 7.925 8 7.925s8-3.547 8-7.925c0-4.376-3.13-8.878-8-16.075z"/></svg>';
-    $html .= '  <span>' . $count . '</span>';
+    $html = '<button title="Votar" class="chuvisco-vote ' . $additional_class . '" data-url="' . admin_url('admin-ajax.php') . '" data-post-id="' . $post_id . '">';
+    $html .= '  Votar';
     $html .= '</button>';
 
     return $html;
@@ -78,6 +74,10 @@ function chuvisco_get_post_html($post_id) {
     $external_url = get_post_meta($post_id, 'external_url', true);
     if (!$external_url) $external_url = get_permalink();
     $only_domain = parse_url($external_url, PHP_URL_HOST);
+    $count_key = 'post_like_count';
+    $count = get_post_meta($post_id, $count_key, true);
+
+    if (!$count) $count = 0;
 
     date_default_timezone_set('America/Sao_Paulo');
     $human_date = human_time_diff( strtotime("now"), strtotime(get_the_date('m/d/Y H:i')) );
@@ -87,9 +87,7 @@ function chuvisco_get_post_html($post_id) {
     $html .= chuvisco_get_vote_html($post_id);
     $html .= '  <div class="chuvisco-post-infos">';
     $html .= '    <div class="chuvisco-post-title">';
-    $html .= '          <a href="' . $external_url . '" title="' . get_the_title() . '">';
-    $html .= '              ' . get_the_title();
-    $html .= '          </a>';
+    $html .= '          <a href="' . $external_url . '" title="' . get_the_title() . '">' . get_the_title() . '</a>';
     $html .= '          <div class="chuvisco-post-info">';
 
     if ($in_english) :
@@ -99,7 +97,7 @@ function chuvisco_get_post_html($post_id) {
     $html .= '              <span class="chuvisco-post-domain">' . $only_domain . '</span>';
     $html .= '          </div>';
     $html .= '          <div class="chuvisco-post-date">';
-    $html .= '              enviado por ' . get_the_author_meta('display_name', $post->post_author) . ' há <a href="' . get_permalink() . '">' . $human_date . ' atrás</a> | <a href=" ' . get_permalink() . '">' . get_comments_number_text( 'nenhum comentário', '1 comentário', '% comentários' ) . '</a>';
+    $html .= '              <span data-votes-post-id="' . $post_id . '">' . $count . ' </span> votos | por ' . get_the_author_meta('display_name', $post->post_author) . ' <a href="' . get_permalink() . '">' . $human_date . ' atrás</a> | <a href=" ' . get_permalink() . '">' . get_comments_number_text( 'nenhum comentário', '1 comentário', '% comentários' ) . '</a>';
     $html .= '          </div>';
     $html .= '      </div>';
     $html .=    '</div>';
@@ -172,15 +170,89 @@ function chuvisco_ranking_shortcode($atts = [], $content = null, $tag = '') {
     return $html;
 }
 
+function chuvisco_posts_shortcode($atts = [], $content = null, $tag = '') {
+    $atts = array_change_key_case( (array) $atts, CASE_LOWER );
+    $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+    $html = "";
+
+    $chuvisco_posts_atts = shortcode_atts(
+        array(
+            'latest' => false
+        ), $atts, $tag
+    );
+
+    $args = array(
+        'post_type'         => 'chuvisco_post',
+        'posts_per_page'    => 30,
+        'paged'             => $paged,
+        'date_query'        => array(
+            'before'    => "2 days ago"
+        )
+    );
+
+    if ($chuvisco_posts_atts['latest'] == true) {
+        $args['date_query'] = array(
+            'after'    => "2 days ago"
+        );
+    }
+
+    $query = new WP_Query( $args );
+
+    if ($query->have_posts()) :
+        while ($query->have_posts()) : $query->the_post();
+            $html .= chuvisco_get_post_html(get_the_id());
+        endwhile; 
+    endif;
+    
+    return $html;
+}
+
 function chuvisco_form_shortcode() {
-    // do something to $content
-    // always return
-    return "yeaah";
+    if (!is_user_logged_in()) {
+        $html = '<a href="' . home_url( '/login' ) . '">Faça login</a> para acessar esta página.';
+        return $html;
+    }
+
+    if ( $_POST && isset($_POST['title']) ) {
+
+        $alreadyPosted = get_page_by_title($_POST['title'], OBJECT, 'post');
+    
+        if($alreadyPosted->ID && $alreadyPosted->post_author == get_current_user_id()) {
+            wp_redirect(home_url('/p/'.$alreadyPosted->ID));
+            exit;
+        }
+    
+        $post = array(
+            'post_title'    => $_POST['title'],
+            'tags_input'    => $_POST['english'] ? "em-ingles" : "",
+            'meta_input'    => array(
+                'external_url' => $_POST['url'],
+            ),
+            'post_status'   => 'publish',
+            'post_type' 	=> 'chuvisco_post'
+        );
+        $post_id = wp_insert_post($post);
+    }
+
+    $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";  
+    $cur_page_url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];  
+
+    $html = '<div class="chuvisco-form">';
+    $html .= '  <form id="new_post" name="new_post" method="post"  enctype="multipart/form-data">';
+    $html .= '      <input type="text" name="chuvisco_post_url" placeholder="URL do post" required>';
+    $html .= '      <input type="text" name="chuvisco_post_title" placeholder="Título do post" required>';
+    $html .= '      <input type="text" name="chuvisco_post_domain" placeholder="Domínio do post" required>';
+    $html .= '      <input type="submit" value="Enviar">';
+    $html .= '  </form>';
+    $html .= '</div>';
+
+    return $html;
 }
 
 function chuvisco_shortcodes_init() {
     add_shortcode( 'chuvisco-form', 'chuvisco_form_shortcode' );
     add_shortcode( 'chuvisco-ranking', 'chuvisco_ranking_shortcode' );
+    add_shortcode( 'chuvisco-posts', 'chuvisco_posts_shortcode' );
 }
  
 add_action( 'init', 'chuvisco_shortcodes_init' );

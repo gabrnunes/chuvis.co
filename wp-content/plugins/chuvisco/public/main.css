@@ -112,11 +112,36 @@
   transition: 0.2s all ease-in-out;
 }
 
+.chuvisco-form-control {
+  margin-bottom: 0.5rem;
+}
+.chuvisco-form-control label {
+  display: block;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+.chuvisco-form-control input[type="text"],
+.chuvisco-form-control input[type="url"] {
+  width: 100%;
+}
+@media only screen and (min-width: 992px) {
+  .chuvisco-form-control input[type="text"],
+  .chuvisco-form-control input[type="url"] {
+    width: 50%;
+  }
+}
+.chuvisco-form-control .chuvisco-help-block {
+  font-family: monospace;
+  display: block;
+  font-size: 0.75rem;
+}
+
 .chuvisco-bookmarklet {
   padding: 24px;
   margin-top: 32px;
-  max-width: 70%;
   display: none;
+  background-color: var(--chuvisco-background-color);
+  font-family: monospace;
 }
 @media only screen and (min-width: 992px) {
   .chuvisco-bookmarklet {
@@ -128,6 +153,11 @@
   padding: 0.2em 8px;
   text-decoration: none;
   margin-top: 8px;
+  background-color: var(--chuvisco-tertiary-color);
+  color: var(--chuvisco-primary-color);
+}
+.chuvisco-bookmarklet a:hover {
+  color: var(--chuvisco-primary-color);
 }
 
 /*# sourceMappingURL=main.css.map */

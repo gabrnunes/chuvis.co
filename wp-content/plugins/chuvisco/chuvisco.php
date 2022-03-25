@@ -70,7 +70,6 @@ function chuvisco_get_post_html($post_id) {
     $post = get_post( $post_id, OBJECT );
     setup_postdata( $post );
 
-    $in_english = get_post_meta($post_id, 'in_english', true);
     $external_url = get_post_meta($post_id, 'external_url', true);
     if (!$external_url) $external_url = get_permalink();
     $only_domain = parse_url($external_url, PHP_URL_HOST);
@@ -89,15 +88,10 @@ function chuvisco_get_post_html($post_id) {
     $html .= '    <div class="chuvisco-post-title">';
     $html .= '          <a href="' . $external_url . '" title="' . get_the_title() . '">' . get_the_title() . '</a>';
     $html .= '          <div class="chuvisco-post-info">';
-
-    if ($in_english) :
-        $html .= '          <span class="chuvisco-post-tag">em inglês</span>';
-    endif;
-
     $html .= '              <span class="chuvisco-post-domain">' . $only_domain . '</span>';
     $html .= '          </div>';
     $html .= '          <div class="chuvisco-post-date">';
-    $html .= '              <span data-votes-post-id="' . $post_id . '">' . $count . ' </span> votos | por ' . get_the_author_meta('display_name', $post->post_author) . ' <a href="' . get_permalink() . '">' . $human_date . ' atrás</a> | <a href=" ' . get_permalink() . '">' . get_comments_number_text( 'nenhum comentário', '1 comentário', '% comentários' ) . '</a>';
+    $html .= '              <span data-votes-post-id="' . $post_id . '">' . $count . ' </span> votos | por ' . get_the_author_meta('display_name', $post->post_author) . ' <a href="' . get_permalink() . '">' . $human_date . ' atrás</a> | <a href=" ' . get_permalink() . '">' . get_comments_number_text( 'sem comentários', '1 comentário', '% comentários' ) . '</a>';
     $html .= '          </div>';
     $html .= '      </div>';
     $html .=    '</div>';
@@ -213,37 +207,54 @@ function chuvisco_form_shortcode() {
         return $html;
     }
 
-    if ( $_POST && isset($_POST['title']) ) {
+    if ( $_POST && isset($_POST['chuvisco_post_title']) ) {
 
-        $alreadyPosted = get_page_by_title($_POST['title'], OBJECT, 'post');
+        $alreadyPosted = get_page_by_title($_POST['chuvisco_post_title'], OBJECT, 'chuvisco_post');
     
         if($alreadyPosted->ID && $alreadyPosted->post_author == get_current_user_id()) {
-            wp_redirect(home_url('/p/'.$alreadyPosted->ID));
-            exit;
+            $html = 'Parece que este post <a href="'.home_url('/?p='.$alreadyPosted->ID).'">já existe</a>.';
+            return $html;
         }
     
         $post = array(
-            'post_title'    => $_POST['title'],
-            'tags_input'    => $_POST['english'] ? "em-ingles" : "",
+            'post_title'    => $_POST['chuvisco_post_title'],
+            'post_content'  => $_POST['chuvisco_post_content'],
             'meta_input'    => array(
-                'external_url' => $_POST['url'],
+                'external_url' => $_POST['chuvisco_post_url'],
             ),
             'post_status'   => 'publish',
             'post_type' 	=> 'chuvisco_post'
         );
         $post_id = wp_insert_post($post);
-    }
 
-    $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";  
-    $cur_page_url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];  
+        $html = 'Tudo certo! Agora você pode <a href="'.home_url('/?p='.$post_id).'">acessar seu post</a>.';
+        
+        return $html;
+    }
 
     $html = '<div class="chuvisco-form">';
     $html .= '  <form id="new_post" name="new_post" method="post"  enctype="multipart/form-data">';
-    $html .= '      <input type="text" name="chuvisco_post_url" placeholder="URL do post" required>';
-    $html .= '      <input type="text" name="chuvisco_post_title" placeholder="Título do post" required>';
-    $html .= '      <input type="text" name="chuvisco_post_domain" placeholder="Domínio do post" required>';
-    $html .= '      <input type="submit" value="Enviar">';
+    $html .= '      <div class="chuvisco-form-control">';
+    $html .= '          <label for="chuvisco_post_title">Título</label>';
+    $html .= '          <input required type="text" id="chuvisco_post_title" name="chuvisco_post_title" value="'. $_GET['t'] .'">';
+    $html .= '          <span class="chuvisco-help-block">Dê preferência para um título em português.</span>';
+    $html .= '      </div>';
+    $html .= '      <div class="chuvisco-form-control">';
+    $html .= '          <label for="chuvisco_post_url">URL</label>';
+    $html .= '          <input required type="url" id="chuvisco_post_url" name="chuvisco_post_url" placeholder="https://" value="'. $_GET['u'] .'">';
+    $html .= '          <span class="chuvisco-help-block">Qual link você quer compartilhar?</span>';
+    $html .= '      </div>';
+    $html .= '      <div class="chuvisco-form-control">';
+    $html .= '          <label for="chuvisco_post_content">Conteúdo</label>';
+    $html .= '          <textarea rows="5" id="chuvisco_post_content" name="chuvisco_post_content" placeholder="Caso quiser, escreva algo aqui para iniciar uma discussão."></textarea>';
+    $html .= '      </div>';
+    $html .= '      <input type="submit" value="Publicar">';
     $html .= '  </form>';
+    $html .= '</div>';
+
+    $html .= '<div class="chuvisco-bookmarklet">';
+    $html .= '  Se preferir, pode usar nosso bookmarklet! Arraste o botão abaixo para a sua barra de favoritos e clique nele quando quiser compartilhar um link.<br>';
+    $html .= '  <a onclick="return false" href="javascript:window.location=%22https://manualdousuario.net/enviar?u=%22+encodeURIComponent(document.location)+%22&t=%22+encodeURIComponent(document.title)">postar no chuvisco</a>';
     $html .= '</div>';
 
     return $html;

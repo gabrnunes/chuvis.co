@@ -100,7 +100,7 @@
   text-decoration: none;
 }
 .chuvisco-vote-can-vote:hover:after {
-  border-bottom-color: var(--chuvisco-primary-color);
+  border-bottom-color: var(--chuvisco-tertiary-color);
   transition: 0.2s all ease-in-out;
 }
 .chuvisco-vote-already-voted {
@@ -108,7 +108,7 @@
   opacity: 0.5;
 }
 .chuvisco-vote-already-voted:after {
-  border-bottom-color: var(--chuvisco-tertiary-color);
+  border-bottom-color: var(--chuvisco-primary-color);
   transition: 0.2s all ease-in-out;
 }
 

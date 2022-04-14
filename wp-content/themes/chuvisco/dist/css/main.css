@@ -165,6 +165,21 @@ h6 {
   color: #77788c;
 }
 
+.vai-mudar {
+  max-width: 900px;
+  background-color: #505160;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  color: #ffffff;
+  margin: 0 auto 2rem;
+}
+.vai-mudar h2 {
+  font-size: 1.2rem;
+}
+.vai-mudar h2 a {
+  color: #ffffff;
+}
+
 .logo {
   font-weight: 900;
   display: inline-flex;

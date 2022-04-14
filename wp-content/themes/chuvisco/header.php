@@ -76,3 +76,9 @@
       </nav>
     </div>
   </header>
+
+  <section class="vai-mudar">
+    <h2>
+      <a href="https://chuvis.co/o-chuvisco-vai-mudar">O Chuvisco vai mudar. Saiba mais.</a>
+    </h2>
+  </section>

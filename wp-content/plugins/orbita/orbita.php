@@ -139,6 +139,42 @@ function orbita_get_post_html($post_id) {
     return $html;
 }
 
+function orbita_ranking_calculator($args, $comment_points, $vote_points) {
+    $query = new WP_Query( $args );
+    $posts_array = array();
+
+    if (!$query->have_posts()) return $posts_array;
+
+    while ($query->have_posts()) : $query->the_post();
+        $today = new DateTime('NOW');
+        $post_date = new DateTime(get_the_date("Y-m-d H:i:s"));
+
+        $difference = $today->diff($post_date);
+        $difference_days = $difference->d * 24;
+        $difference_hours = $difference->h;
+        $difference_minutes = $difference->i / 60;
+
+        $time_elapsed = $difference_days + $difference_hours + $difference_minutes;
+
+        $points_comments = get_comments_number();
+        $points_votes = get_post_meta(get_the_id(), 'post_like_count', true);
+        $invisible_votes = get_post_meta(get_the_id(), 'invisible_votes', true);
+        $total_points = ($points_comments * $comment_points) + ($points_votes * $vote_points) + ($invisible_votes * $vote_points);
+
+        if ($total_points > 0)  {
+            $total_points = $total_points - ($time_elapsed / 10);
+        }
+
+        $posts_array[] = array(
+            'id' => get_the_id(),
+            'points' => $total_points
+        );
+
+    endwhile; 
+
+    return $posts_array;
+}
+
 function orbita_ranking_shortcode($atts = [], $content = null, $tag = '') {
     $atts = array_change_key_case( (array) $atts, CASE_LOWER );
 
@@ -150,9 +186,7 @@ function orbita_ranking_shortcode($atts = [], $content = null, $tag = '') {
         ), $atts, $tag
     );
 
-    $posts_array = array();
-
-    $args = array(
+    $args_orbita = array(
         'post_type'         => 'orbita_post',
         'posts_per_page'    => -1,
         'date_query'        => array(
@@ -160,38 +194,24 @@ function orbita_ranking_shortcode($atts = [], $content = null, $tag = '') {
         )
     );
 
-    $query = new WP_Query( $args );
+    $orbita_posts_array = orbita_ranking_calculator($args_orbita, $orbita_rank_atts['comment-points'], $orbita_rank_atts['vote-points']);
 
-    if ($query->have_posts()) :
-        while ($query->have_posts()) : $query->the_post();
-            $today = new DateTime('NOW');
-            $post_date = new DateTime(get_the_date("Y-m-d H:i:s"));
-    
-            $difference = $today->diff($post_date);
-            $difference_days = $difference->d * 24;
-            $difference_hours = $difference->h;
-            $difference_minutes = $difference->i / 60;
-    
-            $time_elapsed = $difference_days + $difference_hours + $difference_minutes;
-    
-            $points_comments = get_comments_number();
-            $points_votes = get_post_meta(get_the_id(), 'post_like_count', true);
-            $invisible_votes = get_post_meta(get_the_id(), 'invisible_votes', true);
-            $total_points = ($points_comments * $orbita_rank_atts['comment-points']) + ($points_votes * $orbita_rank_atts['vote-points']) + ($invisible_votes * $orbita_rank_atts['vote-points']);
-    
-            if ($total_points > 0)  {
-                $total_points = $total_points - ($time_elapsed / 10);
-    
-                $posts_array[] = array(
-                    'id' => get_the_id(),
-                    'points' => $total_points
-                );
-            }
-        endwhile; 
-    
-        usort($posts_array, 'orbita_sort_by_points');
-        $posts_array = array_slice($posts_array, 0, 30);
-    endif;
+    $args_blog = array(
+        'posts_per_page'    => 20,
+        'meta_query'        => array(
+            array(
+                'key'   => 'orbita_featured',
+                'value' => '1',
+            )
+        )
+    );
+
+    $blog_posts_array = orbita_ranking_calculator($args_blog, $orbita_rank_atts['comment-points'], $orbita_rank_atts['vote-points']);
+
+    $posts_array = array_merge($orbita_posts_array, $blog_posts_array);
+ 
+    usort($posts_array, 'orbita_sort_by_points');
+    $posts_array = array_slice($posts_array, 0, 30);
 
     $html = '<div class="orbita-ranking">';
 

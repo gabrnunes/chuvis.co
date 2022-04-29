@@ -6,6 +6,8 @@ $desktop: "only screen and (min-width : 700px)";
   --orbita-tertiary-color: #939393;
   --orbita-background-color: #e6e6e6;
   --orbita-background-seconday-color: #cecece;
+  --orbita-link-color: royalblue;
+  --orbita-link-hover-color: midnightblue;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -15,6 +17,8 @@ $desktop: "only screen and (min-width : 700px)";
     --orbita-tertiary-color: #5f5f5f;
     --orbita-background-color: #212121;
     --orbita-background-seconday-color: #404040;
+    --orbita-link-color: rgb(104, 135, 231);
+    --orbita-link-hover-color: rgb(101, 101, 221);
   }
 }
 
@@ -27,7 +31,7 @@ $desktop: "only screen and (min-width : 700px)";
 
 .orbita_post {
   padding: 6rem 0;
-	margin: 0 auto;
+  margin: 0 auto;
 }
 
 .orbita-post {
@@ -69,6 +73,12 @@ $desktop: "only screen and (min-width : 700px)";
         text-decoration: underline;
       }
     }
+
+    .orbita-report-link {
+      font-size: 0.85rem;
+      float: none;
+      text-transform: lowercase;
+    }
   }
 }
 
@@ -101,7 +111,9 @@ $desktop: "only screen and (min-width : 700px)";
     display: inline;
     line-height: 1;
 
-    &:visited, &:hover, &:active {
+    &:visited,
+    &:hover,
+    &:active {
       color: var(--orbita-secondary-color);
     }
   }
@@ -224,6 +236,29 @@ $desktop: "only screen and (min-width : 700px)";
     margin-top: 8px;
     background-color: var(--orbita-tertiary-color);
     color: var(--orbita-primary-color);
+
+    &:hover {
+      color: var(--orbita-primary-color);
+    }
+  }
+}
+
+.orbita-report-link {
+  float: right;
+  border: 0;
+  background-color: transparent;
+  color: var(--orbita-link-color);
+  text-decoration: underline;
+  padding: 0;
+
+  &:hover {
+    color: var(--orbita-link-hover-color);
+  }
+
+  &-already-reported {
+    text-decoration: none;
+    color: var(--orbita-primary-color);
+    cursor: default;
 
     &:hover {
       color: var(--orbita-primary-color);

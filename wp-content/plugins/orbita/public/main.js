@@ -11,6 +11,26 @@ document.addEventListener(
         return false;
       });
     });
+
+    var reportButtons = document.querySelectorAll(".orbita-report-link");
+
+    reportButtons.forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        report(
+          button.dataset.url,
+          button.dataset.commentId,
+          button.dataset.postId,
+          button
+        );
+
+        button.classList.add("orbita-report-link-already-reported");
+        button.innerHTML = "Ok! Obrigado.";
+        button.disabled = true;
+
+        event.preventDefault;
+        return false;
+      });
+    });
   },
   false
 );
@@ -44,4 +64,18 @@ function upVote(url, postId, object) {
       }
     }
   };
+}
+
+function report(url, commentId, postId, object) {
+  // Exemplo de requisição POST
+  var ajax = new XMLHttpRequest();
+
+  // Seta tipo de requisição: Post e a URL da API
+  ajax.open("POST", url, true);
+  ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+  // Seta paramêtros da requisição e envia a requisição
+  ajax.send(
+    "action=orbita_report&comment_id=" + commentId + "&post_id=" + postId
+  );
 }

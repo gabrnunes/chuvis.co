@@ -130,7 +130,7 @@ function orbita_get_post_html($post_id) {
     $html .= '              <span class="orbita-post-domain">' . $only_domain . '</span>';
     $html .= '          </div>';
     $html .= '          <div class="orbita-post-date">';
-    $html .= '              <span data-votes-post-id="' . $post_id . '">' . $count . ' </span> ' . $votes_text . ' | por ' . get_the_author_meta('display_name', $post->post_author) . ' ' . $human_date . ' atrás | <a href=" ' . get_permalink() . '">' . get_comments_number_text( 'sem comentários', '1 comentário', '% comentários' ) . '</a>';
+    $html .= '              <span data-votes-post-id="' . $post_id . '">' . $count . ' </span> ' . $votes_text . ' | por ' . get_the_author_meta('display_name', $post->post_author) . ' ' . $human_date . ' atrás | <a href=" ' . get_permalink() . '">' . get_comments_number_text( 'sem comentários', '1 comentário', '% comentários' ) . '</a> | <button data-url="'. admin_url('admin-ajax.php') .'" data-post-id="'.$post_id.'" class="orbita-report-link">Reportar</button>';
     $html .= '          </div>';
     $html .= '      </div>';
     $html .=    '</div>';
@@ -299,6 +299,17 @@ function orbita_form_shortcode() {
 
         orbita_increase_post_like($post_id);
 
+        $admin_email = get_option('admin_email');
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+        $admin_url = get_admin_url();
+        $edit_url = $admin_url . 'post.php?post=' . $post_id . '&action=edit';
+
+        $send_email = wp_mail($admin_email,
+            "[Órbita] Novo post: '" . $_POST['orbita_post_title'],
+            'Link para editar: <a href="' . $edit_url . '">Clique aqui para editar o post</a>',
+            $headers
+        );
+
         $html = orbita_get_header_html();
 
         $html .= 'Tudo certo! Agora você pode <a href="'.home_url('/?p='.$post_id).'">acessar seu post</a>.';
@@ -359,6 +370,120 @@ function orbita_shortcodes_init() {
 }
  
 add_action( 'init', 'orbita_shortcodes_init' );
+
+/****************** Enviar e-mails para cada comentário feito *********************/
+
+function orbita_comment_post($comment_id) { 
+    $comment = get_comment($comment_id);
+    $admin_email = get_option('admin_email');
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+    $post_title = get_the_title($comment->comment_post_ID);
+    $edit_url = get_admin_url() . 'post.php?post=' . $comment->comment_post_ID . '&action=edit';
+
+    $send_email = wp_mail($admin_email,
+        "[Manual] Novo comentário em '" . $post_title . "'",
+        $comment->comment_content . '<br>' .
+        'Comentado por: ' . $comment->comment_author . ' <'. $comment->comment_author_email .'><br><br>' .
+        'Link para editar: <a href="' . $edit_url . '">Clique aqui para editar o comentário</a>',
+        $headers
+    );
+}; 
+
+add_action( 'comment_post', 'orbita_comment_post', 10, 3 ); 
+
+/****************** Denúncia de comentários e posts *********************/
+
+
+function orbita_get_comment_depth( $my_comment_id ) {
+	$depth_level = 0;
+	while( $my_comment_id > 0 ) {
+		$my_comment = get_comment( $my_comment_id );
+		$my_comment_id = $my_comment->comment_parent;
+		$depth_level++;
+	}
+	return $depth_level;
+}
+
+function orbita_add_report_button_to_reply_link( $comment_reply_link, $args, $comment, $post ) {
+    $comment_id = $comment->comment_ID;
+    $class = 'orbita-report-link';
+
+    $pattern = '#(<a.+class=.+comment-(reply|login)-l(i|o)(.*)[^>]+>)(.+)(</a>)#msiU';
+    $replacement = "$0 " . '<button data-url="'. admin_url('admin-ajax.php') .'" data-comment-id="'.$comment_id.'" class="' . $class . '">Reportar</button>';
+    $comment_reply_link = preg_replace($pattern, $replacement, $comment_reply_link);
+
+    return $comment_reply_link;
+}
+
+function orbita_add_report_button_to_content( $comment_content, $comment, $args) {
+    $depth = orbita_get_comment_depth( $comment->comment_ID );
+    $thread_comments_depth = get_option( 'thread_comments_depth' );
+
+    if ( $depth < $thread_comments_depth ) {
+        return $comment_content;
+    }
+    
+    $comment_id = $comment->comment_ID;
+    $class = 'orbita-report-link';
+
+    $comment_content .= '<br /><br /><button data-url="'. admin_url('admin-ajax.php') .'" data-comment-id="'.$comment_id.'" class="' . $class . '">Reportar</button>';
+
+    return $comment_content;
+}
+
+add_filter( 'comment_reply_link', 'orbita_add_report_button_to_reply_link', 10, 4 );
+add_filter( 'get_comment_text', 'orbita_add_report_button_to_content', 10, 4 );
+
+function orbita_report_comment_or_post()
+{
+    if(!$_POST)
+        return;
+
+    $admin_url = get_admin_url();
+    $edit_url = '';
+    $report_type = '';
+    $report_id = '';
+    $report_description = '';
+    $current_user = wp_get_current_user();
+    $user = $current_user->user_login ? $current_user->user_login : 'um Usuário anônimo';
+    $post = get_post( $_POST['post_id'] );
+    $comment = get_comment( $_POST['comment_id'] );
+
+    if(isset($post)) {
+        $edit_url = $admin_url . 'post.php?post=' . $_POST['post_id'] . '&action=edit';
+        $report_id = $_POST['post_id'];
+        $report_type = 'Post';
+        $report_description = "O post '" . $post->post_title . "' no Órbita foi denunciado por '" . $user . "'.";
+    } elseif (isset($comment)) {
+        $edit_url = $admin_url . 'comment.php?action=editcomment&c=' . $_POST['comment_id'];
+        $post = get_post( $comment->comment_post_ID );
+        $report_id = $_POST['comment_id'];
+        $report_type = 'Comentário';
+        $report_description = "Um comentário feito em '". $post->post_title ."' foi denunciado por '" . $user . "'";
+    }
+
+    $admin_email = get_option('admin_email');
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+
+    $send_email = wp_mail($admin_email,
+        '[Órbita] Nova denúncia de ' . $report_type . ' #' . $report_id,
+        $report_description . '<br><br>' .
+        'Link para editar: <a href="' . $edit_url . '">Clique aqui para editar o ' . $report_type . '</a>',
+        $headers
+    );
+
+    if ($send_email) {
+        echo json_encode(array('success' => true));
+    } else {
+        echo json_encode(array('success' => false));
+    }
+
+    wp_die();
+}
+
+add_action('wp_ajax_nopriv_orbita_report', 'orbita_report_comment_or_post');
+add_action('wp_ajax_orbita_report', 'orbita_report_comment_or_post');
+
 
 /****************** Ativação e desativação do plugin *********************/
 
